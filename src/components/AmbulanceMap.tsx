@@ -1,73 +1,58 @@
-import React from 'react';
-import { MapPin } from 'lucide-react';
+// src/components/AmbulanceMap.tsx
+import React from "react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+
+// Définition du centre de la carte (Nord-Pas-de-Calais)
+const defaultCenter: [number, number] = [50.62925, 3.057256]; // Lille
+
+// Chargement des icônes d'ambulance
+import libreIconUrl from "../assets/libre.png";
+import occupeIconUrl from "../assets/occupe.png";
+import pauseIconUrl from "../assets/pause.png";
+
+// Définition des icônes personnalisées
+const ambulanceIcons = {
+  libre: new L.Icon({ iconUrl: libreIconUrl, iconSize: [32, 32] }),
+  occupe: new L.Icon({ iconUrl: occupeIconUrl, iconSize: [32, 32] }),
+  pause: new L.Icon({ iconUrl: pauseIconUrl, iconSize: [32, 32] }),
+};
+
+// Données des ambulances avec leur statut et leur localisation
+const ambulances = [
+  { id: "AMB-101", equipe: "Martin D. / Sophie L.", lat: 50.62925, lng: 3.057256, status: "libre" }, // Lille
+  { id: "AMB-203", equipe: "Thomas B. / Julie R.", lat: 50.690102, lng: 2.889883, status: "occupe" }, // Armentières
+  { id: "VSL-301", equipe: "Paul G. / Léa M.", lat: 50.518, lng: 2.632, status: "pause" }, // Béthune
+  { id: "AMB-417", equipe: "Hugo T. / Camille R.", lat: 50.284, lng: 2.781, status: "libre" }, // Arras
+  { id: "VSL-420", equipe: "Emma V. / Nathan S.", lat: 50.723, lng: 2.539, status: "occupe" }, // Dunkerque
+  { id: "AMB-118", equipe: "Lucas V. / Marie D.", lat: 50.995, lng: 2.295, status: "pause" }, // Calais
+];
 
 const AmbulanceMap: React.FC = () => {
-  // This is a placeholder component for the map
-  // In a real application, you would integrate with a mapping library like Leaflet or Google Maps
-  
   return (
-    <div className="relative h-full w-full bg-blue-50 flex items-center justify-center">
-      <div className="absolute w-full h-full">
-        {/* This would be replaced with an actual map */}
-        <img 
-          src="https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" 
-          alt="City Map" 
-          className="w-full h-full object-cover opacity-50"
-        />
-      </div>
-      
-      {/* Ambulance markers */}
-      <div className="absolute top-1/4 left-1/4">
-        <div className="relative">
-          <MapPin size={24} className="text-green-600" />
-          <div className="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full"></div>
-        </div>
-      </div>
-      
-      <div className="absolute top-1/3 right-1/3">
-        <div className="relative">
-          <MapPin size={24} className="text-blue-600" />
-          <div className="absolute -top-1 -right-1 h-3 w-3 bg-blue-500 rounded-full"></div>
-        </div>
-      </div>
-      
-      <div className="absolute bottom-1/4 right-1/4">
-        <div className="relative">
-          <MapPin size={24} className="text-red-600" />
-          <div className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></div>
-        </div>
-      </div>
-      
-      <div className="absolute bottom-1/3 left-1/3">
-        <div className="relative">
-          <MapPin size={24} className="text-gray-600" />
-          <div className="absolute -top-1 -right-1 h-3 w-3 bg-gray-500 rounded-full"></div>
-        </div>
-      </div>
-      
-      {/* Hospital markers */}
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-        <div className="bg-white p-1 rounded-full shadow-md">
-          <div className="h-6 w-6 bg-red-100 rounded-full flex items-center justify-center">
-            <span className="text-red-600 font-bold">H</span>
-          </div>
-        </div>
-        <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 bg-white px-2 py-1 rounded text-xs shadow-sm">
-          Hôpital Central
-        </div>
-      </div>
-      
-      <div className="absolute bottom-1/4 left-1/2">
-        <div className="bg-white p-1 rounded-full shadow-md">
-          <div className="h-6 w-6 bg-red-100 rounded-full flex items-center justify-center">
-            <span className="text-red-600 font-bold">H</span>
-          </div>
-        </div>
-        <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 bg-white px-2 py-1 rounded text-xs shadow-sm">
-          Clinique St. Michel
-        </div>
-      </div>
-    </div>
+    <MapContainer center={defaultCenter} zoom={8} className="w-full h-80 rounded-lg overflow-hidden">
+      {/* Couches de la carte OpenStreetMap */}
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      />
+
+      {/* Marqueurs des ambulances */}
+      {ambulances.map((ambulance) => (
+        <Marker
+          key={ambulance.id}
+          position={[ambulance.lat, ambulance.lng]}
+          icon={ambulanceIcons[ambulance.status as keyof typeof ambulanceIcons]} // Sélection de l'icône selon le statut
+        >
+          <Popup>
+            <strong>{ambulance.id}</strong><br />
+            🚑 {ambulance.equipe}<br />
+            Statut : {ambulance.status}
+          </Popup>
+        </Marker>
+      ))}
+    </MapContainer>
   );
 };
 

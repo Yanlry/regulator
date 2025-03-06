@@ -1,5 +1,3 @@
-// screens/Dashboard.tsx
-
 import Notifications from "../components/Notifications";
 import TransportVolume from "../components/TransportVolume";
 

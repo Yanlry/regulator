@@ -5,7 +5,7 @@ interface TransportVolumeChartProps {
 }
 
 const TransportVolumeChart: React.FC<TransportVolumeChartProps> = ({ selectedPeriod }) => {
-  // Sample data for different periods
+
   const transportData = {
     "Aujourd'hui": [
       { hour: '6h', count: 2 },
@@ -38,7 +38,6 @@ const TransportVolumeChart: React.FC<TransportVolumeChartProps> = ({ selectedPer
     ],
   };
 
-  // Sélection des données selon la période choisie
   type Period = "Aujourd'hui" | "Cette semaine" | "Ce mois";
   const hourlyData = transportData[selectedPeriod as Period] || transportData["Aujourd'hui"];
   const maxCount = Math.max(...hourlyData.map((item) => item.count));

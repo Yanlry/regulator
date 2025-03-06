@@ -2,7 +2,9 @@ import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./screens/Dashboard";
-import Ambulances from "./screens/Ambulances"; // Nouvelle page
+import Ambulances from "./screens/Ambulances";
+import Localisation from "./screens/Localisation";
+import Revision from "./screens/Revision";
 
 const App = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -23,6 +25,8 @@ const App = () => {
               path="/ambulances"
               element={<Ambulances isOpen={isOpen} />}
             />
+            <Route path="/localisation" element={<Localisation isOpen={isOpen} />} />
+            <Route path="/revision" element={<Revision isOpen={isOpen} />} /> 
           </Routes>
         </div>
       </div>

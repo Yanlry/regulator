@@ -26,12 +26,12 @@ interface AmbulanceTrackingProps {
 const AmbulanceTracking: React.FC<AmbulanceTrackingProps> = ({ stats }) => {
 
   const ambulances = [
-    { id: "AMB-101", lat: 50.62925, lng: 3.057256, status: "Libre", statusColor: "bg-green-500", location: "35 Rue Jean Sans Peur, Lille", destination: "12 Rue de la Justice, Lys-Lez-Lannoy", heureDepart: "10:00", heureArrivee: "10:16"}, // Lille
-    { id: "AMB-203", lat: 50.690102, lng: 2.889883, status: "Occupé", statusColor: "bg-red-500", location: "187 Avenue de la république, Marcq-en-Baroeul", destination: "Hospital B", heureDepart: "10:30", heureArrivee: "10:58" }, // Armentières
-    { id: "VSL-301", lat: 50.518, lng: 2.632, status: "Pause", statusColor: "bg-yellow-500", location: "12 Rue Jouffroy, Lys-Lez-Lannoy", destination: "Hôpital Victor Provo", heureDepart: "11:00", heureArrivee: "11:07" }, // Béthune
-    { id: "AMB-417", lat: 50.284, lng: 2.781, status: "Libre", statusColor: "bg-green-500", location: "CH. Roger Salengro", destination: "HPVA", heureDepart: "11:30", heureArrivee: "11:55" }, // Arras
-    { id: "VSL-420", lat: 50.723, lng: 2.539, status: "Occupé", statusColor: "bg-red-500", location: "Centre E.L.A.N, Hopital de Wattrelos", destination: "32 Rue Jean Mermoz, Wattrelos", heureDepart: "12:00", heureArrivee: "12:12" }, // Dunkerque
-    { id: "AMB-118", lat: 50.995, lng: 2.295, status: "Pause", statusColor: "bg-yellow-500", location: "Clinique Les Peupliers", destination: "22 Rue du Docteur Schweitzer, Roubaix", heureDepart: "12:30", heureArrivee: "12:54" }, // Calais
+    { id: "AMB-101", lat: 50.62925, lng: 3.057256, status: "Libre", statusColor: "bg-green-500", location: "35 Rue Jean Sans Peur, Lille", destination: "12 Rue de la Justice, Lys-Lez-Lannoy", heureDepart: "10:00", heureArrivee: "10:16"},  
+    { id: "AMB-203", lat: 50.690102, lng: 2.889883, status: "Occupé", statusColor: "bg-red-500", location: "187 Avenue de la république, Marcq-en-Baroeul", destination: "Hospital Claude Huriez, Centre Sud", heureDepart: "10:30", heureArrivee: "10:58" }, 
+    { id: "VSL-301", lat: 50.518, lng: 2.632, status: "Pause", statusColor: "bg-yellow-500", location: "12 Rue Jouffroy, Lys-Lez-Lannoy", destination: "Hôpital Victor Provo", heureDepart: "11:00", heureArrivee: "11:07" },  
+    { id: "AMB-417", lat: 50.284, lng: 2.781, status: "Libre", statusColor: "bg-green-500", location: "CH. Roger Salengro", destination: "HPVA", heureDepart: "11:30", heureArrivee: "11:55" },  
+    { id: "VSL-420", lat: 50.723, lng: 2.539, status: "Occupé", statusColor: "bg-red-500", location: "Centre E.L.A.N, Hopital de Wattrelos", destination: "32 Rue Jean Mermoz, Wattrelos", heureDepart: "12:00", heureArrivee: "12:12" },  
+    { id: "AMB-118", lat: 50.995, lng: 2.295, status: "Pause", statusColor: "bg-yellow-500", location: "Clinique Les Peupliers", destination: "22 Rue du Docteur Schweitzer, Roubaix", heureDepart: "12:30", heureArrivee: "12:54" },  
   ];
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -42,7 +42,7 @@ const AmbulanceTracking: React.FC<AmbulanceTrackingProps> = ({ stats }) => {
 
   const scroll: ScrollFunction = (direction) => {
     if (scrollRef.current) {
-      const scrollAmount = 400; // Distance de scroll en pixels
+      const scrollAmount = 600; 
       scrollRef.current.scrollBy({
         left: direction === "left" ? -scrollAmount : scrollAmount,
         behavior: "smooth",
@@ -95,7 +95,7 @@ const AmbulanceTracking: React.FC<AmbulanceTrackingProps> = ({ stats }) => {
         <table className="min-w-[1200px] divide-y divide-gray-200">
           <thead className="bg-gray-100 sticky top-0 z-10">
             <tr>
-              {["Ambulance", "Statut", "Lieu actuel", "Destination", "Départ", "Arrivée"].map((header) => (
+              {["Vehicule", "Statut", "Lieu actuel", "Destination", "Départ", "Arrivée"].map((header) => (
                 <th
                   key={header}
                   className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"

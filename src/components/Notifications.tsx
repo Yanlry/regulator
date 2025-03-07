@@ -60,7 +60,7 @@ const notifications = [
 
 const Notifications = () => {
   return (
-    <div className="lg:col-span-2 bg-white rounded-xl shadow-md p-6">
+    <div className="lg:col-span-3 bg-white rounded-xl shadow-md p-6">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold text-gray-800">Notifications et alertes</h2>
         <button className="text-blue-500 hover:text-blue-700">Tout marquer comme lu</button>

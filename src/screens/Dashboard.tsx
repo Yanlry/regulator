@@ -7,7 +7,7 @@ import Header from "../components/Header";
 import ReturnsList from "../components/ReturnsList";
 import TransportTable from "../components/TransportTable";
 import InterventionSummary from "../components/InterventionSummary";
-
+import ProximityTransport from "../components/ProximityTransport";
 
 interface DashboardProps {
   isOpen: boolean;
@@ -70,6 +70,7 @@ const Dashboard = ({ isOpen }: DashboardProps) => {
 
   const transports = [
     {
+      id: "1",
       ambulance: "AMB-101",
       equipe: "Martin D. / Sophie L.",
       lieuActuel: "Hôpital Central, Paris",
@@ -77,8 +78,19 @@ const Dashboard = ({ isOpen }: DashboardProps) => {
       rdv: "10:30",
       status: "En route",
       statusColor: "bg-blue-100 text-blue-800",
+      distance: "2 km",
+      heurePrevue: "10:30",
+      patient: {
+        nom: "Durand",
+        prenom: "Paul",
+        adresse: "5 Rue Lafayette, Paris",
+        telephone: "06 12 34 56 78",
+        heureDomicile: "10:00",
+        heureHopital: "10:30",
+      },
     },
     {
+      id: "2",
       ambulance: "AMB-203",
       equipe: "Thomas B. / Julie R.",
       lieuActuel: "23 Rue du Commerce, Lyon",
@@ -86,8 +98,19 @@ const Dashboard = ({ isOpen }: DashboardProps) => {
       rdv: "10:45",
       status: "Urgence",
       statusColor: "bg-red-100 text-red-800",
+      distance: "1.5 km",
+      heurePrevue: "10:45",
+      patient: {
+        nom: "Lemoine",
+        prenom: "Sophie",
+        adresse: "8 Avenue des Alpes, Lyon",
+        telephone: "06 98 76 54 32",
+        heureDomicile: "10:20",
+        heureHopital: "10:45",
+      },
     },
     {
+      id: "3",
       ambulance: "AMB-156",
       equipe: "Pierre M. / Emma T.",
       lieuActuel: "Clinique St. Michel, Marseille",
@@ -95,8 +118,19 @@ const Dashboard = ({ isOpen }: DashboardProps) => {
       rdv: "11:15",
       status: "Terminé",
       statusColor: "bg-green-100 text-green-800",
+      distance: "3 km",
+      heurePrevue: "11:15",
+      patient: {
+        nom: "Moreau",
+        prenom: "Jean",
+        adresse: "14 Rue de la République, Marseille",
+        telephone: "07 45 67 89 01",
+        heureDomicile: "10:50",
+        heureHopital: "11:15",
+      },
     },
     {
+      id: "4",
       ambulance: "AMB-118",
       equipe: "Lucas V. / Marie D.",
       lieuActuel: "Base centrale, Lille",
@@ -104,15 +138,16 @@ const Dashboard = ({ isOpen }: DashboardProps) => {
       rdv: "11:30",
       status: "En attente",
       statusColor: "bg-yellow-100 text-yellow-800",
-    },
-    {
-      ambulance: "AMB-142",
-      equipe: "Antoine F. / Clara M.",
-      lieuActuel: "Hôpital Central, Bordeaux",
-      destination: "12 Rue des Fleurs, Bordeaux",
-      rdv: "12:15",
-      status: "Retour prévu",
-      statusColor: "bg-orange-100 text-orange-800",
+      distance: "1 km",
+      heurePrevue: "11:30",
+      patient: {
+        nom: "Dubois",
+        prenom: "Claire",
+        adresse: "2 Rue Victor Hugo, Lille",
+        telephone: "06 34 78 12 90",
+        heureDomicile: "11:00",
+        heureHopital: "11:30",
+      },
     },
   ];
 
@@ -124,7 +159,7 @@ const Dashboard = ({ isOpen }: DashboardProps) => {
   ];
 
   return (
-<div className="flex min-h-screen w-full bg-gray-100">
+    <div className="flex min-h-screen w-full bg-gray-100">
       {/* Sidebar */}
 
       {/* Main Content */}
@@ -163,9 +198,10 @@ const Dashboard = ({ isOpen }: DashboardProps) => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <TransportTable transports={transports} />
           <AmbulanceTracking stats={ambulanceStats} activities={[]} />
-          <TransportVolume />
-          <Notifications />
           <InterventionSummary />
+          <TransportVolume />
+          <ProximityTransport transports={transports} />
+          <Notifications />
         </div>
       </div>
     </div>

@@ -50,7 +50,6 @@ const AmbulanceTracking: React.FC<AmbulanceTrackingProps> = ({ stats }) => {
     }
   };
 
-
   return (
     <div className="lg:col-span-2 bg-white rounded-xl shadow-md p-6">
       <div className="flex justify-between items-center mb-4">

@@ -2,9 +2,9 @@ import React from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import libreIconUrl from "../assets/libre.png";
-import occupeIconUrl from "../assets/occupe.png";
-import pauseIconUrl from "../assets/pause.png";
+import libreIconUrl from "../../assets/libre.png";
+import occupeIconUrl from "../../assets/occupe.png";
+import pauseIconUrl from "../../assets/pause.png";
 
 const defaultCenter: [number, number] = [50.62925, 3.057256]; 
 

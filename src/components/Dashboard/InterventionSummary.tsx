@@ -1,5 +1,3 @@
-import React from "react";
-
 const interventionData = [
   {
     label: "Patients transportés",

@@ -10,7 +10,6 @@ import {
   Menu,
   LogOut,
   Truck,
-  Wrench,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { NavLink } from "react-router-dom";
@@ -101,15 +100,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             <Truck size={20} />
             {isOpen && <span>Mes ambulances</span>}
           </Link>
-
-          {/* Lien vers Prochaines révisions avec une clé à molette */}
-          <Link
-            to="/revision"
-            className="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-lg transition-all"
-          >
-            <Wrench size={20} /> {/* Icône de clé à molette 🛠️ */}
-            {isOpen && <span>Prochaines révisions</span>}
-          </Link>
         </nav>
       </div>
 
@@ -121,17 +111,25 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         )}
         <nav className="space-y-2">
           {[
-            { icon: PlusCircle, label: "Rendez-vous" },
-            { icon: List, label: "Liste des patients" },
+            {
+              icon: PlusCircle,
+              label: "Rendez-vous",
+              path: "/newAppointement",
+            },
+            {
+              icon: List,
+              label: "Liste des patients",
+              path: "/liste-patients",
+            },
           ].map((item, index) => (
-            <a
+            <Link
               key={index}
-              href="#"
+              to={item.path}
               className="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-lg transition-all"
             >
               <item.icon size={20} />
               {isOpen && <span>{item.label}</span>}
-            </a>
+            </Link>
           ))}
         </nav>
       </div>

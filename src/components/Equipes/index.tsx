@@ -1,21 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import { Equipe, equipesData } from './data';
 import EquipeList from './EquipeList';
 import EquipeForm from './EquipeForm';
 import EquipeMap from './EquipeMap';
 import StatsDashboard from './StatsDashboard';
+import LoadingSpinner from '../Common/LoadingSpinner';
 
 interface EquipesProps {
   isOpen: boolean;
 }
 
 const Equipes: React.FC<EquipesProps> = ({ isOpen }) => {
-  const [equipes, setEquipes] = useState<Equipe[]>(equipesData);
+  const [equipes, setEquipes] = useState<Equipe[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [currentEquipe, setCurrentEquipe] = useState<Equipe | null>(null);
   const [viewMode, setViewMode] = useState<'liste' | 'carte'>('liste');
   const [filtreStatus, setFiltreStatus] = useState<'tous' | 'disponible' | 'enMission'>('tous');
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Simulation du chargement des données
+  useEffect(() => {
+    const loadEquipesData = async () => {
+      try {
+        // Simuler une requête réseau ou tout autre traitement
+        await new Promise(resolve => setTimeout(resolve, 1200));
+        
+        // Chargement des données
+        setEquipes(equipesData);
+        
+        // Une fois les données chargées, désactiver l'état de chargement
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Erreur lors du chargement des équipes:", error);
+        setIsLoading(false);
+      }
+    };
+
+    loadEquipesData();
+  }, []);
 
   const handleEditEquipe = (equipe: Equipe) => {
     setCurrentEquipe({...equipe});
@@ -79,84 +102,92 @@ const Equipes: React.FC<EquipesProps> = ({ isOpen }) => {
 
   return (
     <div
-      className={`transition-all duration-300 p-6 bg-gray-100 min-h-screen ${
+      className={`transition-all duration-300 bg-gray-100 min-h-screen ${
         isOpen ? "ml-64" : "ml-16"
       }`}
     >
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Gestion des Équipes d'Ambulances</h1>
-        <div className="flex space-x-3">
-          <div className="flex border rounded overflow-hidden">
+      {isLoading ? (
+        <div className="relative w-full h-full min-h-screen">
+          <LoadingSpinner />
+        </div>
+      ) : (
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold text-gray-800">Gestion des Équipes d'Ambulances</h1>
+            <div className="flex space-x-3">
+              <div className="flex border rounded overflow-hidden">
+                <button 
+                  onClick={() => setViewMode('liste')}
+                  className={`px-3 py-1 text-sm ${viewMode === 'liste' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+                >
+                  Vue Liste
+                </button>
+                <button 
+                  onClick={() => setViewMode('carte')}
+                  className={`px-3 py-1 text-sm ${viewMode === 'carte' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+                >
+                  Vue Carte
+                </button>
+              </div>
+            </div>
             <button 
-              onClick={() => setViewMode('liste')}
-              className={`px-3 py-1 text-sm ${viewMode === 'liste' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+              onClick={handleAddEquipe}
+              className="flex items-center px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
             >
-              Vue Liste
-            </button>
-            <button 
-              onClick={() => setViewMode('carte')}
-              className={`px-3 py-1 text-sm ${viewMode === 'carte' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-            >
-              Vue Carte
+              <FaPlus className="mr-1" /> Nouvelle Équipe
             </button>
           </div>
+
+          <div className="flex rounded overflow-hidden mb-4">
+            <button 
+              onClick={() => setFiltreStatus('tous')}
+              className={`px-3 py-1 text-sm ${filtreStatus === 'tous' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+            >
+              Toutes
+            </button>
+            <button 
+              onClick={() => setFiltreStatus('disponible')}
+              className={`px-3 py-1 text-sm ${filtreStatus === 'disponible' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+            >
+              Disponibles
+            </button>
+            <button 
+              onClick={() => setFiltreStatus('enMission')}
+              className={`px-3 py-1 text-sm ${filtreStatus === 'enMission' ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+            >
+              En mission
+            </button>
+          </div>
+
+          {/* Statistiques */}
+          <StatsDashboard equipes={equipes} />
+          
+          {/* Liste des équipes */}
+          {viewMode === 'liste' ? (
+            <EquipeList 
+              equipes={equipesFiltered} 
+              onEdit={handleEditEquipe}
+              onDelete={handleDeleteEquipe}
+              onToggleMission={toggleMissionStatus}
+              onToggleRepas={toggleRepasStatus}
+            />
+          ) : (
+            <EquipeMap equipes={equipesFiltered} />
+          )}
+
+          {/* Modal pour ajouter/éditer une équipe */}
+          {showModal && currentEquipe && (
+            <EquipeForm
+              currentEquipe={currentEquipe}
+              setCurrentEquipe={setCurrentEquipe}
+              onClose={() => {
+                setShowModal(false);
+                setCurrentEquipe(null);
+              }}
+              onSave={handleSaveEquipe}
+            />
+          )}
         </div>
-        <button 
-          onClick={handleAddEquipe}
-          className="flex items-center px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
-        >
-          <FaPlus className="mr-1" /> Nouvelle Équipe
-        </button>
-      </div>
-
-      <div className="flex rounded overflow-hidden mb-4">
-        <button 
-          onClick={() => setFiltreStatus('tous')}
-          className={`px-3 py-1 text-sm ${filtreStatus === 'tous' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-        >
-          Toutes
-        </button>
-        <button 
-          onClick={() => setFiltreStatus('disponible')}
-          className={`px-3 py-1 text-sm ${filtreStatus === 'disponible' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-        >
-          Disponibles
-        </button>
-        <button 
-          onClick={() => setFiltreStatus('enMission')}
-          className={`px-3 py-1 text-sm ${filtreStatus === 'enMission' ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-        >
-          En mission
-        </button>
-      </div>
-
-      {/* Statistiques */}
-      <StatsDashboard equipes={equipes} />
-      
-      {/* Liste des équipes */}
-      {viewMode === 'liste' ? (
-        <EquipeList 
-          equipes={equipesFiltered} 
-          onEdit={handleEditEquipe}
-          onDelete={handleDeleteEquipe}
-          onToggleMission={toggleMissionStatus}
-          onToggleRepas={toggleRepasStatus}
-        />
-      ) : (
-        <EquipeMap equipes={equipesFiltered} />
-      )}
-
-      {/* Modal pour ajouter/éditer une équipe */}
-      {showModal && currentEquipe && (
-        <EquipeForm
-          currentEquipe={currentEquipe}
-          setCurrentEquipe={setCurrentEquipe}
-          onClose={() => {
-            setShowModal(false);
-            setCurrentEquipe(null);
-          }}
-          onSave={handleSaveEquipe}
-        />
       )}
     </div>
   );

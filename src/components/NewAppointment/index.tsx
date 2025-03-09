@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   DndContext,
   closestCenter,
@@ -23,9 +24,21 @@ import PickupDetails from './PickupDetails';
 import DestinationDetails from './DestinationDetails';
 import TransportDetails from './TransportDetails';
 import AppointmentSummary from './AppointementSummary';
-import { Menu } from 'lucide-react';
+import { Menu, ArrowLeft } from 'lucide-react';
 
-const SortableItem = ({ id, children }: { id: string, children: React.ReactNode }) => {
+/**
+ * SortableItem interface for drag and drop functionality
+ */
+interface SortableItemProps {
+  id: string;
+  children: React.ReactNode;
+}
+
+/**
+ * SortableItem component for drag-and-drop functionality
+ * @param props Component input properties
+ */
+const SortableItem: React.FC<SortableItemProps> = ({ id, children }) => {
   const {
     attributes,
     listeners,
@@ -55,7 +68,24 @@ const SortableItem = ({ id, children }: { id: string, children: React.ReactNode 
   );
 };
 
+/**
+ * Component order interface for form section ordering
+ */
+interface ComponentOrder {
+  id: string;
+  name: string;
+}
+
+/**
+ * NewAppointment: Component for creating new transport appointments
+ * Provides a multi-step form with drag-and-drop section reordering
+ * @param props Component input properties
+ */
 const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
+  // Navigation hook for programmatic routing
+  const navigate = useNavigate();
+
+  // Form state management
   const [currentStep, setCurrentStep] = useState<'form' | 'summary'>('form');
   const [appointment, setAppointment] = useState<Appointment>({
     vehicleType: 'ambulance', 
@@ -88,13 +118,15 @@ const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
     additionalNotes: '',
   });
  
-  const [componentsOrder, setComponentsOrder] = useState([
+  // Component ordering state
+  const [componentsOrder, setComponentsOrder] = useState<ComponentOrder[]>([
     { id: 'vehicle', name: 'Type de véhicule' },
     { id: 'locations', name: 'Lieux de départ et d\'arrivée' },
     { id: 'patient', name: 'Information patient' },
     { id: 'transport', name: 'Détails du transport' },
   ]);
  
+  // Configure sensors for drag-and-drop functionality
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -102,7 +134,11 @@ const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
     })
   );
  
-  const handleDragEnd = (event: DragEndEvent) => {
+  /**
+   * Handle drag end event for reordering form sections
+   * @param event The drag end event containing position information
+   */
+  const handleDragEnd = useCallback((event: DragEndEvent): void => {
     const { active, over } = event;
     
     if (!over) return;
@@ -115,26 +151,52 @@ const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
         return arrayMove(items, oldIndex, newIndex);
       });
     }
-  };
+  }, []);
  
-  const handleContinue = (e: React.FormEvent) => {
+  /**
+   * Handle navigation to the summary step
+   * @param e Form event
+   */
+  const handleContinue = useCallback((e: React.FormEvent): void => {
     e.preventDefault();
     setCurrentStep('summary'); 
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  }, []);
  
-  const handleBackToForm = () => {
+  /**
+   * Handle navigation back to the form step
+   */
+  const handleBackToForm = useCallback((): void => {
     setCurrentStep('form'); 
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  }, []);
  
-  const handleSubmit = (e: React.FormEvent) => {
+  /**
+   * Handle form submission to create a new appointment
+   * @param e Form event
+   */
+  const handleSubmit = useCallback((e: React.FormEvent): void => {
     e.preventDefault();
     console.log('Appointment data submitted:', appointment); 
     alert('Rendez-vous créé avec succès!');
-  };
+    // Navigate back to appointments list
+    navigate('/appointments');
+  }, [appointment, navigate]);
+
+  /**
+   * Handle cancellation and return to appointments list
+   */
+  const handleCancel = useCallback((): void => {
+    // Only allow cancellation from the form step, not from summary
+    navigate('/appointments');
+  }, [navigate]);
  
-  const renderComponent = (id: string) => {
+  /**
+   * Render the appropriate component based on the section ID
+   * @param id Section identifier
+   * @returns The corresponding form section component
+   */
+  const renderComponent = useCallback((id: string): React.ReactNode => {
     switch (id) {
       case 'vehicle':
         return (
@@ -173,15 +235,41 @@ const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
       default:
         return null;
     }
-  };
+  }, [appointment, setAppointment]);
 
   return (
     <div className={`transition-all duration-300 bg-gray-100 min-h-screen ${isOpen ? "ml-64" : "ml-16"}`}>
       <div className="max-w-6xl mx-auto p-4">
-        <Header 
-          title="Nouveau Rendez-vous de Transport" 
-          description="Créez un nouveau rendez-vous de transport en ambulance" 
-        />
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center">
+            {/* Masquer le bouton de retour en arrière lorsqu'on est à l'étape récapitulative */}
+            {currentStep === 'form' && (
+              <button 
+                onClick={handleCancel}
+                className="mr-4 p-2 rounded-full hover:bg-gray-200 transition-colors"
+                aria-label="Retour à la liste des rendez-vous"
+              >
+                <ArrowLeft size={24} className="text-gray-700" />
+              </button>
+            )}
+            <Header 
+              title="Nouveau Rendez-vous de Transport" 
+              description="Créez un nouveau rendez-vous de transport en ambulance" 
+            />
+          </div>
+          
+          {/* Afficher le bouton de retour au formulaire uniquement à l'étape récapitulative */}
+          {currentStep === 'summary' && (
+            <button 
+              type="button" 
+              onClick={handleBackToForm}
+              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 flex items-center"
+            >
+              <ArrowLeft size={16} className="mr-2" />
+              Retour au formulaire
+            </button>
+          )}
+        </div>
 
         {currentStep === 'form' ? (
           <form onSubmit={handleContinue} className="space-y-6">
@@ -207,6 +295,7 @@ const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
             <div className="pt-4 border-t border-gray-200 flex justify-end space-x-3">
               <button 
                 type="button" 
+                onClick={handleCancel}
                 className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50"
               >
                 Annuler
@@ -226,18 +315,7 @@ const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
               onSubmit={handleSubmit}
             />
             
-            <div className="flex justify-start">
-              <button 
-                type="button" 
-                onClick={handleBackToForm}
-                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 flex items-center"
-              >
-                <svg className="mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
-                </svg>
-                Retour au formulaire
-              </button>
-            </div>
+            {/* Bouton Retour au formulaire déplacé dans l'en-tête */}
           </div>
         )}
       </div>

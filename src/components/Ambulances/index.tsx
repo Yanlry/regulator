@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Wrench,
   RefreshCw,
@@ -12,6 +12,7 @@ import AmbulanceCard from "./AmbulanceCard";
 import RevisionDetails from "./RevisionDetails";
 import SearchAndFilters from "./SearchAndFilters";
 import StatsDashboard from "./StatsDashboard";
+import LoadingSpinner from "../Common/LoadingSpinner";
 
 const Ambulances: React.FC<AmbulancesProps> = ({ isOpen }) => {
   const [search, setSearch] = useState("");
@@ -21,6 +22,22 @@ const Ambulances: React.FC<AmbulancesProps> = ({ isOpen }) => {
     null
   );
   const [showStats] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simuler un temps de chargement des données
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Erreur lors du chargement des données:", error);
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
 
   const stats = useMemo(() => {
     const totalVehicles = ambulancesData.length;
@@ -94,95 +111,101 @@ const Ambulances: React.FC<AmbulancesProps> = ({ isOpen }) => {
         isOpen ? "ml-64" : "ml-16"
       }`}
     >
-      {/* En-tête */}
-      <header className="bg-white shadow-md p-4 sticky top-0 z-10">
-        <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-            <Wrench size={20} />
-            Maintenance des Ambulances
-            <span className="text-sm font-normal text-gray-500">
-              ({stats.totalVehicles} véhicules)
-            </span>
-          </h1>
-          <div className="flex gap-2">
-            <button
-              onClick={() => console.log("Rafraîchir les données")}
-              className="flex items-center gap-1 bg-gray-100 text-gray-700 px-3 py-1 rounded-md hover:bg-gray-200"
-            >
-              <RefreshCw size={14} />
-              <span className="hidden md:inline text-sm">Rafraîchir</span>
-            </button>
-            <button
-              onClick={() => console.log("Planifier un entretien")}
-              className="flex items-center gap-2 bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700"
-            >
-              <Calendar size={16} />
-              <span className="text-sm">Planifier</span>
-            </button>
-            <button
-              onClick={() => console.log("Ajouter un véhicule")}
-              className="flex items-center gap-2 bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700"
-            >
-              <Plus size={16} />
-              <span className="text-sm">Ajouter</span>
-            </button>
-          </div>
-        </div>
-      </header>
+      {isLoading ? (
+        <LoadingSpinner isOpen={isOpen} />
+      ) : (
+        <>
+          {/* En-tête */}
+          <header className="bg-white shadow-md p-4 sticky top-0 z-10">
+            <div className="container mx-auto flex justify-between items-center">
+              <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <Wrench size={20} />
+                Maintenance des Ambulances
+                <span className="text-sm font-normal text-gray-500">
+                  ({stats.totalVehicles} véhicules)
+                </span>
+              </h1>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => console.log("Rafraîchir les données")}
+                  className="flex items-center gap-1 bg-gray-100 text-gray-700 px-3 py-1 rounded-md hover:bg-gray-200"
+                >
+                  <RefreshCw size={14} />
+                  <span className="hidden md:inline text-sm">Rafraîchir</span>
+                </button>
+                <button
+                  onClick={() => console.log("Planifier un entretien")}
+                  className="flex items-center gap-2 bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700"
+                >
+                  <Calendar size={16} />
+                  <span className="text-sm">Planifier</span>
+                </button>
+                <button
+                  onClick={() => console.log("Ajouter un véhicule")}
+                  className="flex items-center gap-2 bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700"
+                >
+                  <Plus size={16} />
+                  <span className="text-sm">Ajouter</span>
+                </button>
+              </div>
+            </div>
+          </header>
 
-      {/* Contenu principal */}
-      <main className="container mx-auto p-4 space-y-6 max-w-7xl">
-        {/* Statistiques */}
-        {showStats && <StatsDashboard stats={stats} />}
+          {/* Contenu principal */}
+          <main className="container mx-auto p-4 space-y-6 max-w-7xl">
+            {/* Statistiques */}
+            {showStats && <StatsDashboard stats={stats} />}
 
-        {/* Recherche et filtres */}
-        <SearchAndFilters
-          search={search}
-          setSearch={setSearch}
-          filter={filter}
-          setFilter={setFilter}
-          maintenanceFilter={maintenanceFilter}
-          setMaintenanceFilter={setMaintenanceFilter}
-        />
+            {/* Recherche et filtres */}
+            <SearchAndFilters
+              search={search}
+              setSearch={setSearch}
+              filter={filter}
+              setFilter={setFilter}
+              maintenanceFilter={maintenanceFilter}
+              setMaintenanceFilter={setMaintenanceFilter}
+            />
 
-        {/* Liste des ambulances ou détails */}
-        {selectedAmbulance ? (
-          <RevisionDetails
-            ambulance={selectedAmbulance}
-            onClose={() => setSelectedAmbulance(null)}
-          />
-        ) : filteredAmbulances.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredAmbulances.map((ambulance) => (
-              <AmbulanceCard
-                key={ambulance.id}
-                ambulance={ambulance}
-                onSelect={() => setSelectedAmbulance(ambulance)}
+            {/* Liste des ambulances ou détails */}
+            {selectedAmbulance ? (
+              <RevisionDetails
+                ambulance={selectedAmbulance}
+                onClose={() => setSelectedAmbulance(null)}
               />
-            ))}
-          </div>
-        ) : (
-          <div className="bg-white p-6 rounded-md shadow-md text-center">
-            <Search size={32} className="mx-auto text-gray-400 mb-2" />
-            <h3 className="text-md font-medium text-gray-700">
-              Aucun véhicule trouvé
-            </h3>
-            <p className="text-sm text-gray-500 mt-1">
-              Modifiez vos critères de recherche ou de filtrage
-            </p>
-            <button
-              className="mt-3 text-blue-600 hover:text-blue-800 text-sm"
-              onClick={() => {
-                setSearch("");
-                setFilter("all");
-                setMaintenanceFilter("all");
-              }}
-            >
-              Réinitialiser les filtres
-            </button>
-          </div>
-        )}
-      </main>
+            ) : filteredAmbulances.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredAmbulances.map((ambulance) => (
+                  <AmbulanceCard
+                    key={ambulance.id}
+                    ambulance={ambulance}
+                    onSelect={() => setSelectedAmbulance(ambulance)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white p-6 rounded-md shadow-md text-center">
+                <Search size={32} className="mx-auto text-gray-400 mb-2" />
+                <h3 className="text-md font-medium text-gray-700">
+                  Aucun véhicule trouvé
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Modifiez vos critères de recherche ou de filtrage
+                </p>
+                <button
+                  className="mt-3 text-blue-600 hover:text-blue-800 text-sm"
+                  onClick={() => {
+                    setSearch("");
+                    setFilter("all");
+                    setMaintenanceFilter("all");
+                  }}
+                >
+                  Réinitialiser les filtres
+                </button>
+              </div>
+            )}
+          </main>
+        </>
+      )}
     </div>
   );
 };

@@ -114,7 +114,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             {
               icon: PlusCircle,
               label: "Rendez-vous",
-              path: "/newAppointement",
+              path: "/appointments",
             },
             {
               icon: List,

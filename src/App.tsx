@@ -6,16 +6,30 @@ import Ambulances from "./screens/Ambulances";
 import Localisation from "./screens/Localisation";
 import Planning from "./screens/Planning"; 
 import Equipes from "./screens/Equipes"; 
-import NewAppointement from "./screens/NewAppointment";
+import NewAppointment from "./screens/NewAppointment";
+import Appointments from "./screens/Appointments";
 
+/**
+ * Main App component
+ * Handles routing and sidebar state management
+ * @returns The app component
+ */
 const App = () => {
-  const [isOpen, setIsOpen] = useState(true);
+  // State for sidebar visibility
+  const [isOpen, setIsOpen] = useState<boolean>(true);
+
+  /**
+   * Toggle sidebar visibility
+   */
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
 
   return (
     <Router>
       <div className="flex h-screen">
         <div className="h-screen overflow-y-auto">
-          <Sidebar isOpen={isOpen} toggleSidebar={() => setIsOpen(!isOpen)} />
+          <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
         </div>
 
         <div className="flex-1 overflow-y-auto transition-all duration-300">
@@ -25,7 +39,8 @@ const App = () => {
             <Route path="/localisation" element={<Localisation isOpen={isOpen} />} />
             <Route path="/planning" element={<Planning isOpen={isOpen} />} /> 
             <Route path="/equipes" element={<Equipes isOpen={isOpen} />} /> 
-            <Route path="/newAppointement" element={<NewAppointement isOpen={isOpen} />} /> 
+            <Route path="/appointments" element={<Appointments isOpen={isOpen} />} />
+            <Route path="/appointments/new" element={<NewAppointment isOpen={isOpen} />} /> 
           </Routes>
         </div>
       </div>

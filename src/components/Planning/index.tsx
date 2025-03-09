@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { PlanningProps } from "./types";
+import React, { useState, useEffect } from "react";
+import { PlanningProps, EmployeePlanning } from "./types";
 import { 
   employees, 
   initialEmployeesPlanning, 
@@ -12,6 +12,7 @@ import {
 } from "./utils";
 import WeeklyPlanning from "./WeeklyPlanning";
 import MonthlyRecap from "./MonthlyRecap";
+import LoadingSpinner from "../Common/LoadingSpinner";
 
 const Planning: React.FC<PlanningProps> = ({ isOpen }) => {
   const today = new Date();
@@ -20,9 +21,29 @@ const Planning: React.FC<PlanningProps> = ({ isOpen }) => {
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(
     getStartOfWeek(today)
   );
-  const [employeesPlanning, setEmployeesPlanning] = useState(
-    initialEmployeesPlanning
-  );
+  const [employeesPlanning, setEmployeesPlanning] = useState<EmployeePlanning[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulation du chargement des données de planning
+  useEffect(() => {
+    const loadPlanningData = async () => {
+      try {
+        // Simuler une requête réseau ou tout autre traitement
+        await new Promise(resolve => setTimeout(resolve, 1200));
+        
+        // Une fois les données chargées, mettre à jour l'état
+        setEmployeesPlanning(initialEmployeesPlanning);
+        
+        // Désactiver l'état de chargement
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Erreur lors du chargement du planning:", error);
+        setIsLoading(false);
+      }
+    };
+
+    loadPlanningData();
+  }, []);
 
   const weekDays = getWeekDays(currentWeekStart);
 
@@ -75,49 +96,57 @@ const Planning: React.FC<PlanningProps> = ({ isOpen }) => {
 
   return (
     <div
-      className={`transition-all duration-300 p-6 bg-gray-100 min-h-screen ${
+      className={`transition-all duration-300 bg-gray-100 min-h-screen ${
         isOpen ? "ml-64" : "ml-16"
       }`}
     >
-      {/* En-tête du planning */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-2">
-          <h1 className="text-2xl font-bold">
-            Planning du mois de {MONTH_NAMES[currentMonth]} {currentYear}
-          </h1>
-          <div className="flex space-x-2">
-            <button
-              onClick={goToPreviousMonth}
-              className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
-            >
-              &lt; Mois préc.
-            </button>
-            <button
-              onClick={goToNextMonth}
-              className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
-            >
-              Mois suiv. &gt;
-            </button>
-          </div>
+      {isLoading ? (
+        <div className="relative w-full h-full min-h-screen">
+          <LoadingSpinner />
         </div>
-      </div>
+      ) : (
+        <div className="p-6">
+          {/* En-tête du planning */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-2">
+              <h1 className="text-2xl font-bold">
+                Planning du mois de {MONTH_NAMES[currentMonth]} {currentYear}
+              </h1>
+              <div className="flex space-x-2">
+                <button
+                  onClick={goToPreviousMonth}
+                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+                >
+                  &lt; Mois préc.
+                </button>
+                <button
+                  onClick={goToNextMonth}
+                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+                >
+                  Mois suiv. &gt;
+                </button>
+              </div>
+            </div>
+          </div>
 
-      {/* Planning hebdomadaire */}
-      <WeeklyPlanning 
-        employeesPlanning={employeesPlanning}
-        weekDays={weekDays}
-        goToPreviousWeek={goToPreviousWeek}
-        goToNextWeek={goToNextWeek}
-        updateEmployeeStatus={updateEmployeeStatus}
-        statusOptions={STATUS_OPTIONS}
-      />
+          {/* Planning hebdomadaire */}
+          <WeeklyPlanning 
+            employeesPlanning={employeesPlanning}
+            weekDays={weekDays}
+            goToPreviousWeek={goToPreviousWeek}
+            goToNextWeek={goToNextWeek}
+            updateEmployeeStatus={updateEmployeeStatus}
+            statusOptions={STATUS_OPTIONS}
+          />
 
-      {/* Récapitulatif mensuel */}
-      <MonthlyRecap 
-        employees={employees}
-        currentMonth={currentMonth}
-        currentYear={currentYear}
-      />
+          {/* Récapitulatif mensuel */}
+          <MonthlyRecap 
+            employees={employees}
+            currentMonth={currentMonth}
+            currentYear={currentYear}
+          />
+        </div>
+      )}
     </div>
   );
 };

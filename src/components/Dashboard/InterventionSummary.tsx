@@ -52,11 +52,10 @@ const interventionData = [
 
 const InterventionSummary = () => {
   return (
-    <div className="bg-white rounded-xl shadow-md p-6">
+    <div className="bg-white rounded-xl shadow-md p-2">
 
       {/* 📌 En-tête */}
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-gray-800">Résumé des interventions</h2>
         <select className="text-sm border rounded-md px-2 py-1">
           <option>Aujourd'hui</option>
           <option>Cette semaine</option>

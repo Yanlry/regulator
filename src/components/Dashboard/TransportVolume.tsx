@@ -5,13 +5,10 @@ const TransportVolume = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("Aujourd'hui");
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-gray-800">
-          Volume de transports
-        </h2>
+    <div className="bg-white rounded-xl shadow-md p-2 flex flex-col h-full">
+      <div className="flex justify-between items-center mb-3 flex-shrink-0">
         <select
-          className="text-sm border rounded-md px-2 py-1"
+          className="text-xs border border-gray-200 rounded-md px-2 py-1 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500"
           value={selectedPeriod}
           onChange={(e) => setSelectedPeriod(e.target.value)}
         >
@@ -20,7 +17,7 @@ const TransportVolume = () => {
           <option>Ce mois</option>
         </select>
       </div>
-      <div className="h-80 w-full">
+      <div className="flex-grow w-full">
         <TransportVolumeChart selectedPeriod={selectedPeriod} />
       </div>
     </div>

@@ -15,11 +15,7 @@ interface TransportTableProps {
 
 const TransportTable: React.FC<TransportTableProps> = ({ transports }) => {
   return (
-    <div className="lg:col-span-3 bg-white rounded-xl shadow-md p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-gray-800">Transports de la journée</h2>
-        <button className="text-blue-500 hover:text-blue-700">Voir tout</button>
-      </div>
+    <div className="lg:col-span-3 bg-white rounded-xl shadow-md p-2">
 
       {/* Conteneur avec scroll vertical et hauteur max */}
       <div className="overflow-y-auto max-h-96">

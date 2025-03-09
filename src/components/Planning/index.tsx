@@ -24,17 +24,13 @@ const Planning: React.FC<PlanningProps> = ({ isOpen }) => {
   const [employeesPlanning, setEmployeesPlanning] = useState<EmployeePlanning[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Simulation du chargement des données de planning
   useEffect(() => {
     const loadPlanningData = async () => {
       try {
-        // Simuler une requête réseau ou tout autre traitement
         await new Promise(resolve => setTimeout(resolve, 1200));
         
-        // Une fois les données chargées, mettre à jour l'état
         setEmployeesPlanning(initialEmployeesPlanning);
         
-        // Désactiver l'état de chargement
         setIsLoading(false);
       } catch (error) {
         console.error("Erreur lors du chargement du planning:", error);

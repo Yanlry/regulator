@@ -237,21 +237,16 @@ const Dashboard: React.FC<DashboardProps> = ({ isOpen }) => {
 
   const [showWidgetFilter, setShowWidgetFilter] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-
-  // État pour la gestion du chargement
-  useEffect(() => {
-    // Simuler le chargement des données du tableau de bord
+ 
+  useEffect(() => { 
     const loadDashboardData = async () => {
-      try {
-        // Simuler le temps nécessaire pour charger toutes les données des widgets
-        // Dans un cas réel, cela représenterait les appels API ou les traitements de données
+      try {  
         await new Promise((resolve) => setTimeout(resolve, 1500));
-        
-        // Une fois les données chargées, désactiver l'état de chargement
+         
         setIsLoading(false);
       } catch (error) {
         console.error("Erreur lors du chargement des données du tableau de bord:", error);
-        setIsLoading(false); // Désactiver le chargement même en cas d'erreur
+        setIsLoading(false);  
       }
     };
 
@@ -513,8 +508,7 @@ const Dashboard: React.FC<DashboardProps> = ({ isOpen }) => {
       );
     });
   };
-
-  // Afficher le spinner de chargement avant le rendu du tableau de bord
+ 
   if (isLoading) {
     return (
       <div className={`transition-all duration-300 bg-gray-100 min-h-screen ${

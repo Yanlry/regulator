@@ -76,10 +76,26 @@ const RevisionDetails: React.FC<RevisionDetailsProps> = ({ ambulance, onClose })
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-        {ambulance.type === "Ambulance" ? "🚑" : "🚗"} Détails de {ambulance.id}
-      </h2>
-
+     <div className="flex justify-between items-center mb-6">
+  <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+    {ambulance.type === "Ambulance" ? "🚑" : "🚗"} Détails de {ambulance.id}
+  </h2>
+  <button
+    onClick={onClose}
+    className="
+      px-4 py-2 
+      bg-gray-100 text-gray-700 
+      rounded-lg 
+      hover:bg-gray-200 
+      transition-colors 
+      flex items-center 
+      text-sm
+      border border-gray-300
+    "
+  >
+    <X className="mr-2 w-4 h-4" /> Fermer
+  </button>
+</div>
       {/* Informations supplémentaires */}
       <div className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-white p-4 rounded-lg shadow-md">
@@ -232,12 +248,6 @@ const RevisionDetails: React.FC<RevisionDetailsProps> = ({ ambulance, onClose })
           ))}
         </div>
       </div>
-      <button
-        onClick={onClose}
-        className="mt-4 px-4 py-2 bg-gray-300 text-gray-800 rounded-md"
-      >
-        Fermer
-      </button>
     </div>
   );
 };

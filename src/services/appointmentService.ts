@@ -422,7 +422,6 @@ export const fetchAppointmentById = async (id: string): Promise<Appointment | nu
 };
 
 export const createAppointment = async (appointmentData: Omit<Appointment, 'id'>): Promise<Appointment> => {
-  // Simulate API call with delay
   return new Promise((resolve) => {
     setTimeout(() => {
       const newAppointment: Appointment = {

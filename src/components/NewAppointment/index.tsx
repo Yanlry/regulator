@@ -26,18 +26,12 @@ import TransportDetails from './TransportDetails';
 import AppointmentSummary from './AppointementSummary';
 import { Menu, ArrowLeft } from 'lucide-react';
 
-/**
- * SortableItem interface for drag and drop functionality
- */
+
 interface SortableItemProps {
   id: string;
   children: React.ReactNode;
 }
 
-/**
- * SortableItem component for drag-and-drop functionality
- * @param props Component input properties
- */
 const SortableItem: React.FC<SortableItemProps> = ({ id, children }) => {
   const {
     attributes,
@@ -68,24 +62,16 @@ const SortableItem: React.FC<SortableItemProps> = ({ id, children }) => {
   );
 };
 
-/**
- * Component order interface for form section ordering
- */
+
 interface ComponentOrder {
   id: string;
   name: string;
 }
 
-/**
- * NewAppointment: Component for creating new transport appointments
- * Provides a multi-step form with drag-and-drop section reordering
- * @param props Component input properties
- */
+
 const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
-  // Navigation hook for programmatic routing
   const navigate = useNavigate();
 
-  // Form state management
   const [currentStep, setCurrentStep] = useState<'form' | 'summary'>('form');
   const [appointment, setAppointment] = useState<Appointment>({
     vehicleType: 'ambulance', 
@@ -118,7 +104,6 @@ const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
     additionalNotes: '',
   });
  
-  // Component ordering state
   const [componentsOrder, setComponentsOrder] = useState<ComponentOrder[]>([
     { id: 'vehicle', name: 'Type de véhicule' },
     { id: 'locations', name: 'Lieux de départ et d\'arrivée' },
@@ -126,7 +111,6 @@ const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
     { id: 'transport', name: 'Détails du transport' },
   ]);
  
-  // Configure sensors for drag-and-drop functionality
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -134,10 +118,6 @@ const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
     })
   );
  
-  /**
-   * Handle drag end event for reordering form sections
-   * @param event The drag end event containing position information
-   */
   const handleDragEnd = useCallback((event: DragEndEvent): void => {
     const { active, over } = event;
     
@@ -153,49 +133,29 @@ const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
     }
   }, []);
  
-  /**
-   * Handle navigation to the summary step
-   * @param e Form event
-   */
+
   const handleContinue = useCallback((e: React.FormEvent): void => {
     e.preventDefault();
     setCurrentStep('summary'); 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
  
-  /**
-   * Handle navigation back to the form step
-   */
   const handleBackToForm = useCallback((): void => {
     setCurrentStep('form'); 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
  
-  /**
-   * Handle form submission to create a new appointment
-   * @param e Form event
-   */
   const handleSubmit = useCallback((e: React.FormEvent): void => {
     e.preventDefault();
     console.log('Appointment data submitted:', appointment); 
     alert('Rendez-vous créé avec succès!');
-    // Navigate back to appointments list
     navigate('/appointments');
   }, [appointment, navigate]);
 
-  /**
-   * Handle cancellation and return to appointments list
-   */
   const handleCancel = useCallback((): void => {
-    // Only allow cancellation from the form step, not from summary
     navigate('/appointments');
   }, [navigate]);
- 
-  /**
-   * Render the appropriate component based on the section ID
-   * @param id Section identifier
-   * @returns The corresponding form section component
-   */
+
   const renderComponent = useCallback((id: string): React.ReactNode => {
     switch (id) {
       case 'vehicle':

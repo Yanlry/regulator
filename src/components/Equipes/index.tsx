@@ -18,18 +18,14 @@ const Equipes: React.FC<EquipesProps> = ({ isOpen }) => {
   const [viewMode, setViewMode] = useState<'liste' | 'carte'>('liste');
   const [filtreStatus, setFiltreStatus] = useState<'tous' | 'disponible' | 'enMission'>('tous');
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  // Simulation du chargement des données
+ 
   useEffect(() => {
     const loadEquipesData = async () => {
-      try {
-        // Simuler une requête réseau ou tout autre traitement
+      try { 
         await new Promise(resolve => setTimeout(resolve, 1200));
-        
-        // Chargement des données
+         
         setEquipes(equipesData);
-        
-        // Une fois les données chargées, désactiver l'état de chargement
+         
         setIsLoading(false);
       } catch (error) {
         console.error("Erreur lors du chargement des équipes:", error);

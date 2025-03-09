@@ -2,3 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Scrollbar styles */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px; /* Largeur de la scrollbar */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(31, 41, 55, 0.5); /* Fond de la piste gris foncé semi-transparent */
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(75, 85, 99, 0.7); /* Couleur du pouce de scrollbar gris */
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(107, 114, 128, 0.9); /* Couleur au survol */
+}

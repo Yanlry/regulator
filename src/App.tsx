@@ -9,18 +9,9 @@ import Equipes from "./screens/Equipes";
 import NewAppointment from "./screens/NewAppointment";
 import Appointments from "./screens/Appointments";
 
-/**
- * Main App component
- * Handles routing and sidebar state management
- * @returns The app component
- */
 const App = () => {
-  // State for sidebar visibility
   const [isOpen, setIsOpen] = useState<boolean>(true);
 
-  /**
-   * Toggle sidebar visibility
-   */
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };

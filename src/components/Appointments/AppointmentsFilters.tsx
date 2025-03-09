@@ -2,9 +2,6 @@ import React, { useCallback } from 'react';
 import { Search, Calendar } from 'lucide-react';
 import { FilterOptions } from '../Appointments/types';
 
-/**
- * Props interface for the AppointmentsFilters component
- */
 interface AppointmentsFiltersProps {
   filterOptions: FilterOptions;
   onSearchChange: (query: string) => void;
@@ -13,11 +10,6 @@ interface AppointmentsFiltersProps {
   onVehicleTypeChange: (vehicleType: string | null) => void;
 }
 
-/**
- * AppointmentsFilters: Component for filtering the appointments list
- * Provides search, date, status, and vehicle type filters
- * @param props Component input properties
- */
 const AppointmentsFilters: React.FC<AppointmentsFiltersProps> = ({
   filterOptions,
   onSearchChange,
@@ -25,30 +17,20 @@ const AppointmentsFilters: React.FC<AppointmentsFiltersProps> = ({
   onStatusChange,
   onVehicleTypeChange
 }) => {
-  /**
-   * Handle search input changes
-   */
+
   const handleSearchInput = useCallback((e: React.ChangeEvent<HTMLInputElement>): void => {
     onSearchChange(e.target.value);
   }, [onSearchChange]);
 
-  /**
-   * Handle date filter changes
-   */
+
   const handleDateInput = useCallback((e: React.ChangeEvent<HTMLInputElement>): void => {
     onDateChange(e.target.value || null);
   }, [onDateChange]);
 
-  /**
-   * Handle status filter changes
-   */
   const handleStatusSelect = useCallback((e: React.ChangeEvent<HTMLSelectElement>): void => {
     onStatusChange(e.target.value || null);
   }, [onStatusChange]);
 
-  /**
-   * Handle vehicle type filter changes
-   */
   const handleVehicleTypeSelect = useCallback((e: React.ChangeEvent<HTMLSelectElement>): void => {
     onVehicleTypeChange(e.target.value || null);
   }, [onVehicleTypeChange]);

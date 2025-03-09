@@ -1,18 +1,10 @@
 import React from 'react';
 import { PlusCircle } from 'lucide-react';
 
-/**
- * Props interface for the AppointmentsHeader component
- */
 interface AppointmentsHeaderProps {
   onNewAppointment: () => void;
 }
 
-/**
- * AppointmentsHeader: Header component for the appointments list
- * Displays the title and provides the "New Appointment" button
- * @param props Component input properties
- */
 const AppointmentsHeader: React.FC<AppointmentsHeaderProps> = ({ onNewAppointment }) => {
   return (
     <div className="flex justify-between items-center mb-6">

@@ -2,28 +2,17 @@ import React, { useMemo } from 'react';
 import { Calendar, Clock } from 'lucide-react';
 import { Appointment, AppointmentStatus, UrgencyLevel } from '../Appointments/types';
 
-/**
- * Props interface for the AppointmentCard component
- */
 interface AppointmentCardProps {
   appointment: Appointment;
   onViewDetails: (id: string) => void;
   onEdit: (id: string) => void;
 }
 
-/**
- * AppointmentCard: Displays a single appointment in the list
- * Contains patient details, pickup/destination info, and action buttons
- * @param props Component input properties
- */
 const AppointmentCard: React.FC<AppointmentCardProps> = ({
   appointment,
   onViewDetails,
   onEdit
 }) => {
-  /**
-   * Get CSS classes for status badge based on status value
-   */
   const statusBadgeClasses = useMemo((): string => {
     switch (appointment.status) {
       case 'confirmed':
@@ -41,9 +30,6 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
     }
   }, [appointment.status]);
 
-  /**
-   * Get CSS classes for urgency badge based on urgency level
-   */
   const urgencyBadgeClasses = useMemo((): string => {
     switch (appointment.urgencyLevel) {
       case 'critical':
@@ -59,9 +45,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
     }
   }, [appointment.urgencyLevel]);
 
-  /**
-   * Translate status to French
-   */
+
   const translateStatus = (status: AppointmentStatus): string => {
     switch (status) {
       case 'confirmed': return 'Confirmé';
@@ -72,9 +56,6 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
     }
   };
 
-  /**
-   * Translate urgency level to French
-   */
   const translateUrgency = (level: UrgencyLevel): string => {
     switch (level) {
       case 'critical': return 'Critique';
@@ -84,9 +65,6 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
     }
   };
 
-  /**
-   * Translate vehicle type to French
-   */
   const translateVehicleType = useMemo((): string => {
     switch (appointment.vehicleType) {
       case 'ambulance': return 'Ambulance';
@@ -96,16 +74,10 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
     }
   }, [appointment.vehicleType]);
 
-  /**
-   * Handle view details button click
-   */
   const handleViewDetails = (): void => {
     onViewDetails(appointment.id);
   };
 
-  /**
-   * Handle edit button click
-   */
   const handleEdit = (): void => {
     onEdit(appointment.id);
   };

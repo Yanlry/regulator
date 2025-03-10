@@ -275,7 +275,7 @@ const ProximityTransport = ({ transports = demoTransports }) => {
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-gray-800 flex items-center">
             <span className="bg-blue-500 w-2 h-6 rounded mr-3"></span>
-            Tableau de Bord des Transports à Proximité
+            Transports à Proximité
           </h2>
         </div>
         <div className="flex-grow flex items-center justify-center bg-gray-50 rounded-lg p-10">
@@ -299,7 +299,7 @@ const ProximityTransport = ({ transports = demoTransports }) => {
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4 border-b border-gray-100 pb-4">
         <h2 className="text-xl font-bold text-gray-800 flex items-center">
           <span className="bg-blue-500 w-2 h-6 rounded mr-3"></span>
-          Tableau de Bord des Transports à Proximité
+          Transports à Proximité
         </h2>
 
         <div className="flex flex-wrap items-center gap-4">

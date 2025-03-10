@@ -6,11 +6,11 @@ import LoadingSpinner from "../components/Common/LoadingSpinner";
 import { calculerStatistiques } from "../components/Localisation/data/statistics";
 import { ambulances } from "../components/Localisation/data/ambulances";
 import { FilterOptions } from "../components/Localisation/data/types";
-interface LocalisationProps {
+interface LocalisationScreenProps {
   isOpen: boolean;
 }
 
-const Localisation: React.FC<LocalisationProps> = ({ isOpen }) => {
+const LocalisationScreen: React.FC<LocalisationScreenProps> = ({ isOpen }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [showDetails, setShowDetails] = useState(true);
   const [selectedAmbulanceId, setSelectedAmbulanceId] = useState<string | null>(null);
@@ -33,6 +33,12 @@ const Localisation: React.FC<LocalisationProps> = ({ isOpen }) => {
 
   const handleAmbulanceClick = (id: string) => {
     setSelectedAmbulanceId(id);
+    setShowDetails(true);
+  };
+
+  // Nouvelle fonction pour afficher le tableau de bord
+  const showDashboard = () => {
+    setSelectedAmbulanceId(null);
     setShowDetails(true);
   };
 
@@ -86,6 +92,8 @@ const Localisation: React.FC<LocalisationProps> = ({ isOpen }) => {
             stats={stats}
             showDetails={showDetails}
             setShowDetails={setShowDetails}
+            selectedAmbulanceId={selectedAmbulanceId}
+            showDashboard={showDashboard}
           />
 
           {/* Conteneur principal */}
@@ -113,4 +121,4 @@ const Localisation: React.FC<LocalisationProps> = ({ isOpen }) => {
   );
 };
 
-export default Localisation;
+export default LocalisationScreen;

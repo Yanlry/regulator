@@ -6,8 +6,8 @@ import pauseIconUrl from "../../../assets/pause.png";
 import hopitalIconUrl from "../../../assets/hospital.png";
 
 export const ambulanceIcons: IconOptions = {
-  libre: new L.Icon({ iconUrl: libreIconUrl, iconSize: [32, 32] }),
-  occupe: new L.Icon({ iconUrl: occupeIconUrl, iconSize: [32, 32] }),
-  pause: new L.Icon({ iconUrl: pauseIconUrl, iconSize: [32, 32] }),
-  hopital: new L.Icon({ iconUrl: hopitalIconUrl, iconSize: [38, 38] }),
+  libre: new L.Icon({ iconUrl: libreIconUrl, iconSize: [50, 50] }),
+  occupe: new L.Icon({ iconUrl: occupeIconUrl, iconSize: [50, 50] }),
+  pause: new L.Icon({ iconUrl: pauseIconUrl, iconSize: [50, 50] }),
+  hopital: new L.Icon({ iconUrl: hopitalIconUrl, iconSize: [60, 60] }),
 };

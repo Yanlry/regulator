@@ -9,13 +9,15 @@ import { hopitaux } from "../data/hopitaux";
 import { defaultCenter, defaultZoom } from "../utils/mapUtils";
 
 // Composant pour gérer l'accès à l'instance de la carte
-const MapController: React.FC<{ onMapReady: (map: L.Map) => void }> = ({ onMapReady }) => {
+const MapController: React.FC<{ onMapReady: (map: L.Map) => void }> = ({
+  onMapReady,
+}) => {
   const map = useMap();
-  
+
   useEffect(() => {
     onMapReady(map);
   }, [map, onMapReady]);
-  
+
   return null;
 };
 
@@ -49,18 +51,18 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   return (
     <div
-  className={`${
-    showDetails ? "w-3/4" : "w-full"
-  } transition-all duration-300 relative z-10`} // Ajout de z-10
-  style={{ height: "100%" }}
->
+      className={`${
+        showDetails ? "w-3/4" : "w-full"
+      } transition-all duration-300 relative z-10`} // Ajout de z-10
+      style={{ height: "100%" }}
+    >
       <MapContainer
-    center={defaultCenter}
-    zoom={defaultZoom}
-    className="w-full h-full relative z-0"
+        center={defaultCenter}
+        zoom={defaultZoom}
+        className="w-full h-full relative z-0"
       >
         <MapController onMapReady={handleMapReady} />
-        
+
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -84,11 +86,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
       {/* Bouton pour afficher/masquer les détails - avec position fixe */}
       <div className="absolute bottom-4 right-4 z-[60]">
-      <ControlButton
-        showDetails={showDetails}
-        setShowDetails={handleToggleDetails}
-      />
-    </div>
+        <ControlButton
+          showDetails={showDetails}
+          setShowDetails={handleToggleDetails}
+        />
+      </div>
     </div>
   );
 };

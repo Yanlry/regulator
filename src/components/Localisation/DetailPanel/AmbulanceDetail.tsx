@@ -153,19 +153,19 @@ const AmbulanceDetail: React.FC<ExtendedAmbulanceProps> = ({ ambulance }) => {
         nom: "Dubois",
         prenom: "Jean",
         telephone: "06 12 34 56 78",
-        qualification: ["VSL", "Ambulance", "Premiers secours"],
+        qualification: ["Ambulancier"],
         tempsService: "4h15",
-        tempsRepos: "45 min restantes",
+        tempsRepos: "2h19",
         coursesJour: 5
       },
       secondaire: {
         nom: "Martin",
         prenom: "Sophie",
         telephone: "06 98 76 54 32",
-        qualification: ["VSL", "Transport PMR"],
+        qualification: ["Auxiliaire ambulancier"],
         tempsService: "3h45",
-        tempsRepos: "1h restante",
-        coursesJour: 4
+        tempsRepos: "1h",
+        coursesJour: 5
       }
     },
     
@@ -703,12 +703,12 @@ const AmbulanceDetail: React.FC<ExtendedAmbulanceProps> = ({ ambulance }) => {
                 
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs mt-3 border-t border-gray-200 pt-2">
                   <div>
-                    <span className="text-gray-500 block mb-0.5">En service:</span>
+                    <span className="text-gray-500 block mb-0.5">Heures à 25% :</span>
                     <span className="font-medium text-gray-800">{extendedAmbulance.chauffeurs.principal.tempsService}</span>
                   </div>
                   
                   <div>
-                    <span className="text-gray-500 block mb-0.5">Repos:</span>
+                    <span className="text-gray-500 block mb-0.5">Heures à 50% :</span>
                     <span className="font-medium text-gray-800">{extendedAmbulance.chauffeurs.principal.tempsRepos}</span>
                   </div>
                 </div>
@@ -751,12 +751,12 @@ const AmbulanceDetail: React.FC<ExtendedAmbulanceProps> = ({ ambulance }) => {
                   
                   <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs mt-3 border-t border-gray-200 pt-2">
                     <div>
-                      <span className="text-gray-500 block mb-0.5">En service:</span>
+                      <span className="text-gray-500 block mb-0.5">Heure à 25% :</span>
                       <span className="font-medium text-gray-800">{extendedAmbulance.chauffeurs.secondaire.tempsService}</span>
                     </div>
                     
                     <div>
-                      <span className="text-gray-500 block mb-0.5">Repos:</span>
+                      <span className="text-gray-500 block mb-0.5">Heures à 50% :</span>
                       <span className="font-medium text-gray-800">{extendedAmbulance.chauffeurs.secondaire.tempsRepos}</span>
                     </div>
                   </div>

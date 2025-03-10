@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Home,
   Calendar,
@@ -15,6 +15,7 @@ import {
   BarChart,
   Settings,
   Shield,
+  Command,
 } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
 
@@ -26,24 +27,17 @@ interface SidebarProps {
 // Navigation Section Configuration
 const navigationSections = [
   {
-    title: "Dashboard",
-    items: [{ icon: Home, label: "Tableau de bord", path: "/" }],
-  },
-  {
-    title: "Gestion des Ressources",
+    title: "Gestion de la régulation",
     items: [
-      { icon: Truck, label: "Ambulances", path: "/ambulances" },
+      { icon: Home, label: "Tableau de bord", path: "/" },
+      { icon: Command, label: "Régulation", path: "/regulation" },
+      { icon: Users, label: "Équipes", path: "/equipes" },
       { icon: MapPin, label: "Localisation", path: "/localisation" },
     ],
   },
   {
-    title: "Gestion des Salariés",
-    items: [
-      { icon: Users, label: "Équipes", path: "/equipes" },
-      { icon: Calendar, label: "Planning", path: "/planning" },
-      { icon: UserCheck, label: "Gestion RH", path: "/rh" },
-      { icon: Briefcase, label: "Recrutement", path: "/recrutement" },
-    ],
+    title: "Gestion des Véhicules",
+    items: [{ icon: Truck, label: "Ambulances", path: "/ambulances" }],
   },
   {
     title: "Gestion des Patients",
@@ -52,6 +46,15 @@ const navigationSections = [
       { icon: List, label: "Liste des patients", path: "/liste-patients" },
     ],
   },
+  {
+    title: "Gestion des Salariés",
+    items: [
+      { icon: Calendar, label: "Planning", path: "/planning" },
+      { icon: UserCheck, label: "Gestion RH", path: "/rh" },
+      { icon: Briefcase, label: "Recrutement", path: "/recrutement" },
+    ],
+  },
+
   {
     title: "Outils et Analyse",
     items: [
@@ -62,6 +65,38 @@ const navigationSections = [
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
+  // État pour le menu de paramètres
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  // État pour l'option de fermeture automatique
+  const [autoClose, setAutoClose] = useState(false);
+
+  // Référence pour détecter les clics en dehors du menu de paramètres
+  const settingsRef = useRef<HTMLDivElement>(null);
+
+  // Gestionnaire pour les clics sur les éléments du menu
+  const handleMenuClick = () => {
+    if (isOpen && autoClose) {
+      toggleSidebar();
+    }
+  };
+
+  // Gestionnaire pour fermer le menu des paramètres lors de clics externes
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        settingsRef.current &&
+        !settingsRef.current.contains(event.target as Node)
+      ) {
+        setSettingsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [settingsRef]);
+
   return (
     <div
       className={`
@@ -91,6 +126,45 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
               </div>
             )}
           </div>
+
+          {/* Icône de paramètres (clé à molette) */}
+          {/* Icône de paramètres (clé à molette) - visible uniquement quand la sidebar est ouverte */}
+          {isOpen && (
+            <div className="relative ml-1" ref={settingsRef}>
+              <button
+                className="p-2 hover:bg-gray-700 rounded-md transition-all"
+                onClick={() => setSettingsOpen(!settingsOpen)}
+                title="Paramètres de la barre latérale"
+              >
+                <Settings
+                  size={20}
+                  className="text-gray-300 hover:text-white"
+                />
+              </button>
+
+              {/* Menu déroulant des paramètres */}
+              {settingsOpen && (
+                <div className="absolute right-0 mt-2 w-64 bg-gray-800 rounded-md shadow-lg z-50 text-sm">
+                  <div className="p-3 border-b border-gray-700">
+                    <h3 className="font-semibold">
+                      Options de la barre latérale
+                    </h3>
+                  </div>
+                  <div className="p-3">
+                    <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-700 p-2 rounded">
+                      <input
+                        type="checkbox"
+                        checked={autoClose}
+                        onChange={() => setAutoClose(!autoClose)}
+                        className="rounded text-blue-500 focus:ring-blue-500"
+                      />
+                      <span>Fermer après sélection d'un menu</span>
+                    </label>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Search Bar */}
@@ -114,10 +188,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
       </div>
 
       {/* Scrollable Navigation Section */}
-      <div className={`
+      <div
+        className={`
         flex-1 overflow-y-auto custom-scrollbar
         ${isOpen ? "px-4 pr-5" : "px-2"}
-      `}>
+      `}
+      >
         <div>
           {navigationSections.map((section, sectionIndex) => (
             <div key={sectionIndex} className="mb-6">
@@ -131,6 +207,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                   <NavLink
                     key={itemIndex}
                     to={item.path}
+                    onClick={handleMenuClick}
                     className={({ isActive }) => `
                       flex items-center
                       p-2 rounded-lg 
@@ -144,7 +221,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                       }
                     `}
                   >
-                    <div className={`flex items-center justify-center ${isOpen ? "w-8 h-8" : "w-10 h-10"}`}>
+                    <div
+                      className={`flex items-center justify-center ${
+                        isOpen ? "w-8 h-8" : "w-10 h-10"
+                      }`}
+                    >
                       <item.icon
                         size={22}
                         className="
@@ -159,7 +240,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
               </nav>
             </div>
           ))}
-          
+
           {isOpen && (
             <h2 className="text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider pl-2">
               Système
@@ -168,6 +249,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
           <nav className="space-y-2 mb-6">
             <Link
               to="/parametres"
+              onClick={handleMenuClick}
               className={`
                 flex items-center
                 p-2 rounded-lg 
@@ -178,9 +260,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                 ${isOpen ? "pl-3 gap-3" : "justify-center"}
               `}
             >
-              <div className={`flex items-center justify-center ${isOpen ? "w-8 h-8" : "w-10 h-10"}`}>
-                <Settings 
-                  size={22} 
+              <div
+                className={`flex items-center justify-center ${
+                  isOpen ? "w-8 h-8" : "w-10 h-10"
+                }`}
+              >
+                <Settings
+                  size={22}
                   className="group-hover:scale-110 transition-transform"
                 />
               </div>
@@ -189,11 +275,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
           </nav>
         </div>
       </div>
-      
+
       {/* Fixed Footer Section */}
       <div className={`${isOpen ? "p-4 pt-2" : "p-2 pt-2"}`}>
         <button
-          onClick={() => console.log("Déconnexion")}
+          onClick={() => {
+            console.log("Déconnexion");
+            if (isOpen && autoClose) {
+              toggleSidebar();
+            }
+          }}
           className={`
             flex items-center
             w-full 
@@ -205,7 +296,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             ${isOpen ? "pl-3 gap-3 p-2 justify-start" : "justify-center p-3"}
           `}
         >
-          <div className={`flex items-center justify-center ${isOpen ? "w-8 h-8" : "w-6 h-6"}`}>
+          <div
+            className={`flex items-center justify-center ${
+              isOpen ? "w-8 h-8" : "w-6 h-6"
+            }`}
+          >
             <LogOut
               size={22}
               className="group-hover:-translate-x-1 transition-transform"

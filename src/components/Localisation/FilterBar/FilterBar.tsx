@@ -32,6 +32,8 @@ interface FilterBarProps {
   stats?: Stats;
   showDetails: boolean;
   setShowDetails: (show: boolean) => void;
+  selectedAmbulanceId: string | null;
+  showDashboard: () => void;
 }
 
 const FilterBar: React.FC<FilterBarProps> = ({
@@ -40,6 +42,8 @@ const FilterBar: React.FC<FilterBarProps> = ({
   stats = {}, 
   showDetails,
   setShowDetails,
+  selectedAmbulanceId,
+  showDashboard,
 }) => {
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
   const filterMenuRef = useRef<HTMLDivElement>(null);
@@ -49,6 +53,37 @@ const FilterBar: React.FC<FilterBarProps> = ({
     event.preventDefault();
     event.stopPropagation();
     setIsFilterMenuOpen(prev => !prev);
+  };
+
+  // Gestionnaire pour le bouton Tableau de Bord/Fermer
+  const handleDashboardButton = () => {
+    if (showDetails && selectedAmbulanceId) {
+      // Si un véhicule est sélectionné, on ferme simplement le panel
+      setShowDetails(false);
+    } else if (showDetails) {
+      // Si le tableau de bord est affiché, on ferme le panel
+      setShowDetails(false);
+    } else {
+      // Si rien n'est affiché, on affiche le tableau de bord
+      showDashboard();
+    }
+  };
+
+  // Déterminer le texte et l'icône du bouton
+  const getDashboardButtonContent = () => {
+    if (showDetails) {
+      return (
+        <>
+          <X className="mr-2 w-4 h-4" /> Fermer
+        </>
+      );
+    } else {
+      return (
+        <>
+          <BarChart4 className="mr-2 w-4 h-4" /> Tableau de Bord
+        </>
+      );
+    }
   };
 
   useEffect(() => {
@@ -146,7 +181,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
         <div className="flex items-center space-x-3">
           {/* Bouton Tableau de Bord */}
           <button
-            onClick={() => setShowDetails(!showDetails)}
+            onClick={handleDashboardButton}
             className={`
               flex items-center px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300
               ${showDetails 
@@ -154,15 +189,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
                 : 'bg-blue-500 text-white hover:bg-blue-600'}
             `}
           >
-            {showDetails ? (
-              <>
-                <X className="mr-2 w-4 h-4" /> Fermer
-              </>
-            ) : (
-              <>
-                <BarChart4 className="mr-2 w-4 h-4" /> Tableau de Bord
-              </>
-            )}
+            {getDashboardButtonContent()}
           </button>
 
           {/* Menu Filtres */}

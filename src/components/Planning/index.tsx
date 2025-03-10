@@ -14,7 +14,7 @@ import WeeklyPlanning from "./WeeklyPlanning";
 import MonthlyRecap from "./MonthlyRecap";
 import LoadingSpinner from "../../Common/LoadingSpinner";
 
-const Planning: React.FC<PlanningProps> = ({ isOpen }) => {
+const Planning: React.FC<PlanningProps> = () => {
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
@@ -92,10 +92,11 @@ const Planning: React.FC<PlanningProps> = ({ isOpen }) => {
 
   return (
     <div
-      className={`transition-all duration-300 bg-gray-100 min-h-screen ${
-        isOpen ? "ml-64" : "ml-16"
-      }`}
-    >
+    className={`
+      transition-all duration-300 
+      bg-gray-100 min-h-screen p-4
+    `}
+  >
       {isLoading ? (
         <div className="relative w-full h-full min-h-screen">
           <LoadingSpinner />

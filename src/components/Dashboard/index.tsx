@@ -229,7 +229,7 @@ function WidgetFilter({
   );
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ isOpen }) => {
+const Dashboard: React.FC<DashboardProps> = () => {
   const [windowSize, setWindowSize] = useState({
     width: typeof window !== "undefined" ? window.innerWidth : 0,
     height: typeof window !== "undefined" ? window.innerHeight : 0,
@@ -511,9 +511,10 @@ const Dashboard: React.FC<DashboardProps> = ({ isOpen }) => {
  
   if (isLoading) {
     return (
-      <div className={`transition-all duration-300 bg-gray-100 min-h-screen ${
-        isOpen ? "ml-64" : "ml-16"
-      }`}>
+      <div className={`
+        transition-all duration-300 
+        bg-gray-100 min-h-screen 
+      `}>
         <LoadingSpinner />
       </div>
     );
@@ -521,11 +522,12 @@ const Dashboard: React.FC<DashboardProps> = ({ isOpen }) => {
 
   return (
     <div className="flex min-h-screen w-full bg-gray-100">
-      <div
-        className={`transition-all duration-300 p-4 overflow-y-auto h-screen w-full ${
-          isOpen ? "ml-64" : "ml-16"
-        }`}
-      >
+     <div
+      className={`
+        transition-all duration-300 
+        bg-gray-100 min-h-screen p-4
+      `}
+    >
         {/* Header avec bouton de filtre de widgets */}
         <div className="mb-4">
           <Header

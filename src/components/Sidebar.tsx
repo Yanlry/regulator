@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useContext, createContext, useCallback, useEffect, useRef } from "react";
 import {
   Home,
   Calendar,
@@ -19,11 +19,48 @@ import {
 } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
 
-interface SidebarProps {
+/**
+ * Interface pour l'état de la sidebar et fonctions de contrôle
+ */
+interface SidebarContextType {
+  /** État d'ouverture de la sidebar */
   isOpen: boolean;
+  /** Fonction pour ouvrir la sidebar manuellement */
+  openSidebar: () => void;
+  /** Fonction pour fermer la sidebar manuellement */
+  closeSidebar: () => void;
+  /** Fonction pour basculer l'état de la sidebar */
   toggleSidebar: () => void;
 }
 
+/**
+ * Contexte pour partager l'état de la sidebar dans l'application
+ */
+const SidebarContext = createContext<SidebarContextType | null>(null);
+
+/**
+ * Hook personnalisé pour accéder à l'état de la sidebar
+ * @returns État et contrôles de la sidebar
+ */
+export const useSidebar = (): SidebarContextType => {
+  const context = useContext(SidebarContext);
+  if (!context) {
+    throw new Error("useSidebar doit être utilisé dans un SidebarProvider");
+  }
+  return context;
+};
+
+/**
+ * Props du composant SidebarProvider
+ */
+interface SidebarProviderProps {
+  /** Composants enfants */
+  children: React.ReactNode;
+}
+
+/**
+ * Structure de navigation de l'application
+ */
 const navigationSections = [
   {
     title: "Gestion de la régulation",
@@ -53,7 +90,6 @@ const navigationSections = [
       { icon: Briefcase, label: "Recrutement", path: "/recrutement" },
     ],
   },
-
   {
     title: "Outils et Analyse",
     items: [
@@ -63,19 +99,66 @@ const navigationSections = [
   },
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
+/**
+ * Fournisseur de contexte pour la sidebar
+ * @param props Props du composant
+ */
+export const SidebarProvider: React.FC<SidebarProviderProps> = ({ children }) => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  
+  const openSidebar = useCallback(() => setIsOpen(true), []);
+  const closeSidebar = useCallback(() => setIsOpen(false), []);
+  const toggleSidebar = useCallback(() => setIsOpen(prev => !prev), []);
+  
+  const contextValue = {
+    isOpen,
+    openSidebar,
+    closeSidebar,
+    toggleSidebar
+  };
+  
+  return (
+    <SidebarContext.Provider value={contextValue}>
+      {children}
+    </SidebarContext.Provider>
+  );
+};
 
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [autoClose, setAutoClose] = useState(false);
-
+/**
+ * Composant Sidebar avec ouverture au survol
+ */
+const Sidebar: React.FC = () => {
+  const { isOpen, openSidebar, closeSidebar, toggleSidebar } = useSidebar();
+  
+  const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
+  const [hoverMode, setHoverMode] = useState<boolean>(true);
+  
   const settingsRef = useRef<HTMLDivElement>(null);
+  // Utilisé number au lieu de NodeJS.Timeout pour éviter l'erreur d'espace de noms
+  const timeoutRef = useRef<number | null>(null);
 
-  const handleMenuClick = () => {
-    if (isOpen && autoClose) {
-      toggleSidebar();
+  
+  // Gestion du survol
+  const handleMouseEnter = () => {
+    if (hoverMode && !isOpen) {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      openSidebar();
     }
   };
-
+  
+  const handleMouseLeave = () => {
+    if (hoverMode && isOpen) {
+      // Petit délai avant de fermer pour éviter les fermetures accidentelles
+      timeoutRef.current = window.setTimeout(() => {
+        closeSidebar();
+      }, 300);
+    }
+  };
+  
+  // Détecte les clics en dehors du menu des paramètres
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -91,6 +174,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [settingsRef]);
+  
+  // Nettoie le timeout lorsque le composant est démonté
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current !== null) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div
@@ -100,8 +192,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         transition-all duration-300 
         fixed left-0 top-0 h-screen 
         flex flex-col 
+        z-50
         ${isOpen ? "w-64" : "w-16"}
       `}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <div className={`${isOpen ? "p-4 pt-6 pb-2" : "p-2 pt-6 pb-2"}`}>
         <div className="flex items-center justify-between mb-6">
@@ -109,6 +204,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             <button
               className="p-2 bg-gray-800 hover:bg-gray-700 rounded-md transition-all"
               onClick={toggleSidebar}
+              title={isOpen ? "Fermer le menu" : "Ouvrir le menu"}
             >
               <Menu size={22} />
             </button>
@@ -140,15 +236,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                       Options de la barre latérale
                     </h3>
                   </div>
-                  <div className="p-3">
+                  <div className="p-3 space-y-2">
                     <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-700 p-2 rounded">
                       <input
                         type="checkbox"
-                        checked={autoClose}
-                        onChange={() => setAutoClose(!autoClose)}
+                        checked={hoverMode}
+                        onChange={() => setHoverMode(!hoverMode)}
                         className="rounded text-blue-500 focus:ring-blue-500"
                       />
-                      <span>Fermer après sélection d'un menu</span>
+                      <span>Ouvrir au survol</span>
                     </label>
                   </div>
                 </div>
@@ -178,9 +274,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 
       <div
         className={`
-        flex-1 overflow-y-auto custom-scrollbar
-        ${isOpen ? "px-4 pr-5" : "px-2"}
-      `}
+          flex-1 overflow-y-auto custom-scrollbar
+          ${isOpen ? "px-4 pr-5" : "px-2"}
+        `}
       >
         <div>
           {navigationSections.map((section, sectionIndex) => (
@@ -195,7 +291,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                   <NavLink
                     key={itemIndex}
                     to={item.path}
-                    onClick={handleMenuClick}
                     className={({ isActive }) => `
                       flex items-center
                       p-2 rounded-lg 
@@ -237,7 +332,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
           <nav className="space-y-2 mb-6">
             <Link
               to="/parametres"
-              onClick={handleMenuClick}
               className={`
                 flex items-center
                 p-2 rounded-lg 
@@ -268,8 +362,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         <button
           onClick={() => {
             console.log("Déconnexion");
-            if (isOpen && autoClose) {
-              toggleSidebar();
+            if (isOpen ) {
+              closeSidebar();
             }
           }}
           className={`
@@ -300,4 +394,4 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   );
 };
 
-export default Sidebar;
+export { Sidebar };

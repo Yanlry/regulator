@@ -11,7 +11,7 @@ interface EquipesProps {
   isOpen: boolean;
 }
 
-const Equipes: React.FC<EquipesProps> = ({ isOpen }) => {
+const Equipes: React.FC<EquipesProps> = () => {
   const [equipes, setEquipes] = useState<Equipe[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [currentEquipe, setCurrentEquipe] = useState<Equipe | null>(null);
@@ -98,9 +98,10 @@ const Equipes: React.FC<EquipesProps> = ({ isOpen }) => {
 
   return (
     <div
-      className={`transition-all duration-300 bg-gray-100 min-h-screen ${
-        isOpen ? "ml-64" : "ml-16"
-      }`}
+      className={`
+        transition-all duration-300 
+        bg-gray-100 min-h-screen p-4
+      `}
     >
       {isLoading ? (
         <div className="relative w-full h-full min-h-screen">

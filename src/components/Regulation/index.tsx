@@ -33,13 +33,12 @@ const Regulation: React.FC<RegulationProps> = ({ isOpen }) => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div
-        className={`
+     <div
+      className={`
         transition-all duration-300 
-        bg-gray-100 min-h-screen 
-        ${isOpen ? "ml-64" : "ml-16"}
+        bg-gray-100 min-h-screen p-4
       `}
-      >
+    >
         {isLoading ? (
           <LoadingSpinner isOpen={isOpen} />
         ) : (

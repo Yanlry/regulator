@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import AppointmentsHeader from '../Appointments/AppointmentsHeader';
 import AppointmentsFilters from '../Appointments/AppointmentsFilters';
 import AppointmentCard from '../Appointments/AppointmentCard';
-import LoadingSpinner from '../Common/LoadingSpinner';
-import EmptyState from '../Common/EmptyState';
+import LoadingSpinner from '../../Common/LoadingSpinner';
+import EmptyState from '../../Common/EmptyState';
 import { Appointment, FilterOptions } from '../Appointments/types';
 import { fetchAppointments } from '../../services/appointmentService';
  

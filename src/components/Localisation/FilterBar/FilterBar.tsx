@@ -10,7 +10,6 @@ import {
   PauseCircle 
 } from "lucide-react";
 
-// Définir les types ici directement
 interface FilterOptions {
   libre: boolean;
   occupe: boolean;
@@ -55,21 +54,16 @@ const FilterBar: React.FC<FilterBarProps> = ({
     setIsFilterMenuOpen(prev => !prev);
   };
 
-  // Gestionnaire pour le bouton Tableau de Bord/Fermer
   const handleDashboardButton = () => {
     if (showDetails && selectedAmbulanceId) {
-      // Si un véhicule est sélectionné, on ferme simplement le panel
       setShowDetails(false);
     } else if (showDetails) {
-      // Si le tableau de bord est affiché, on ferme le panel
       setShowDetails(false);
     } else {
-      // Si rien n'est affiché, on affiche le tableau de bord
       showDashboard();
     }
   };
 
-  // Déterminer le texte et l'icône du bouton
   const getDashboardButtonContent = () => {
     if (showDetails) {
       return (
@@ -151,11 +145,10 @@ const FilterBar: React.FC<FilterBarProps> = ({
     <div 
       className="
         bg-white border-b border-gray-200 shadow-sm py-3 px-4 
-        relative z-[100] // Increased z-index to ensure it's always on top
+        relative z-[100] 
       "
     >
       <div className="flex justify-between items-center">
-        {/* Section Statistiques */}
         <div className="flex space-x-2">
           <StatBadge 
             color="green" 
@@ -177,9 +170,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
           />
         </div>
 
-        {/* Section Filtres et Tableau de Bord */}
         <div className="flex items-center space-x-3">
-          {/* Bouton Tableau de Bord */}
           <button
             onClick={handleDashboardButton}
             className={`
@@ -192,7 +183,6 @@ const FilterBar: React.FC<FilterBarProps> = ({
             {getDashboardButtonContent()}
           </button>
 
-          {/* Menu Filtres */}
           <div className="relative">
             <button
               ref={filterButtonRef}
@@ -213,7 +203,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
                   absolute right-0 mt-2 w-64 max-h-[calc(100vh-100px)] 
                   overflow-y-auto bg-white 
                   border border-gray-200 rounded-lg shadow-lg 
-                  p-4 space-y-3 z-[110] // Ensure dropdown is above everything
+                  p-4 space-y-3 z-[110]
                 "
                 style={{
                   top: '100%',

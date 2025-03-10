@@ -12,7 +12,7 @@ import {
 } from "./utils";
 import WeeklyPlanning from "./WeeklyPlanning";
 import MonthlyRecap from "./MonthlyRecap";
-import LoadingSpinner from "../Common/LoadingSpinner";
+import LoadingSpinner from "../../Common/LoadingSpinner";
 
 const Planning: React.FC<PlanningProps> = ({ isOpen }) => {
   const today = new Date();

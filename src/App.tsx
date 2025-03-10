@@ -8,8 +8,8 @@ import PlanningScreen from "./screens/PlanningScreen";
 import EquipesScreen from "./screens/EquipesScreen"; 
 import NewAppointmentScreen from "./screens/NewAppointmentScreen";
 import AppointmentsScreen from "./screens/AppointmentsScreen";
-import RegulationScreen from "./screens/RegulationScreen"; // Importez le composant Regulation
-import RhScreen from "./screens/RhScreen"; // Importez le composant Rh
+import RegulationScreen from "./screens/RegulationScreen"; 
+import RhScreen from "./screens/RhScreen"; 
 import RecrutementScreen from "./screens/RecrutementScreen";
 
 const App = () => {

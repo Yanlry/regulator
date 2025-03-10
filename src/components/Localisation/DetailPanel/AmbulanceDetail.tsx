@@ -17,7 +17,6 @@ import {
   AlertTriangle,
 } from "lucide-react";
 
-// Extension du type avec informations détaillées
 interface ExtendedAmbulanceProps extends AmbulanceDetailProps {
   ambulance: Ambulance & {
     id: string;
@@ -28,8 +27,7 @@ interface ExtendedAmbulanceProps extends AmbulanceDetailProps {
     destination?: string;
     heureDepart?: string;
     heureArrivee?: string;
-    
-    // Informations détaillées
+
     patientActuel?: {
       nom: string;
       prenom: string;
@@ -117,7 +115,6 @@ interface ExtendedAmbulanceProps extends AmbulanceDetailProps {
 const AmbulanceDetail: React.FC<ExtendedAmbulanceProps> = ({ ambulance }) => {
   const [activeTab, setActiveTab] = useState<string>("historique");
 
-  // Configuration des données détaillées
   const extendedAmbulance = {
     ...ambulance,
     type: ambulance.type || "VSL 12",
@@ -243,7 +240,6 @@ const AmbulanceDetail: React.FC<ExtendedAmbulanceProps> = ({ ambulance }) => {
     ]
   };
 
-  // Fonctions utilitaires pour les styles
   const getPriorityStyle = (priority: string) => {
     switch (priority) {
       case "P0":

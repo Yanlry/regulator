@@ -119,7 +119,6 @@ const AmbulanceCard: React.FC<AmbulanceCardProps> = ({ ambulance, onSelect }) =>
 
   const handleChange = (field: keyof Ambulance, value: string) => {
     console.log(`Mise à jour de ${field} pour ${ambulance.id} : ${value}`);
-    // Implémentez ici la logique de mise à jour réelle
   };
 
   const handleSave = (field: keyof Ambulance) => {

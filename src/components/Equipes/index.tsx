@@ -5,7 +5,7 @@ import EquipeList from './EquipeList';
 import EquipeForm from './EquipeForm';
 import EquipeMap from './EquipeMap';
 import StatsDashboard from './StatsDashboard';
-import LoadingSpinner from '../Common/LoadingSpinner';
+import LoadingSpinner from '../../Common/LoadingSpinner';
 
 interface EquipesProps {
   isOpen: boolean;

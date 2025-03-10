@@ -24,7 +24,7 @@ import ReturnsList from "./ReturnsList";
 import TransportTable from "./TransportTable";
 import InterventionSummary from "./InterventionSummary";
 import ProximityTransport from "./ProximityTransport";
-import LoadingSpinner from "../Common/LoadingSpinner";
+import LoadingSpinner from "../../Common/LoadingSpinner";
 import {
   GripVertical,
   Eye,

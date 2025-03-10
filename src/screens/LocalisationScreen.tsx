@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import FilterBar from "../components/Localisation/FilterBar/FilterBar";
 import MapComponent from "../components/Localisation/Map/MapComponent";
 import DetailPanel from "../components/Localisation/DetailPanel/DetailPanel";
-import LoadingSpinner from "../components/Common/LoadingSpinner";
+import LoadingSpinner from "../Common/LoadingSpinner";
 import { calculerStatistiques } from "../components/Localisation/data/statistics";
 import { ambulances } from "../components/Localisation/data/ambulances";
 import { FilterOptions } from "../components/Localisation/data/types";

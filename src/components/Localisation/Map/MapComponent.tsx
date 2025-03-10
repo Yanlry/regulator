@@ -8,7 +8,6 @@ import ControlButton from "./ControlButton";
 import { hopitaux } from "../data/hopitaux";
 import { defaultCenter, defaultZoom } from "../utils/mapUtils";
 
-// Composant pour gérer l'accès à l'instance de la carte
 const MapController: React.FC<{ onMapReady: (map: L.Map) => void }> = ({
   onMapReady,
 }) => {
@@ -30,12 +29,10 @@ const MapComponent: React.FC<MapComponentProps> = ({
 }) => {
   const mapRef = useRef<L.Map | null>(null);
 
-  // Fonction mémorisée pour récupérer l'instance de la carte
   const handleMapReady = React.useCallback((map: L.Map) => {
     mapRef.current = map;
   }, []);
 
-  // Redimensionner la carte lorsque le panneau de détails change
   useEffect(() => {
     if (mapRef.current) {
       setTimeout(() => {
@@ -44,7 +41,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
     }
   }, [showDetails]);
 
-  // Fonction pour basculer l'affichage du panneau de détails
   const handleToggleDetails = () => {
     setShowDetails(!showDetails);
   };
@@ -53,7 +49,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     <div
       className={`${
         showDetails ? "w-3/4" : "w-full"
-      } transition-all duration-300 relative z-10`} // Ajout de z-10
+      } transition-all duration-300 relative z-10`} 
       style={{ height: "100%" }}
     >
       <MapContainer
@@ -68,13 +64,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
 
-        {/* Marqueurs des hôpitaux */}
         {activeFilters.showHopitaux &&
           hopitaux.map((hopital) => (
             <HopitalMarker key={hopital.id} hopital={hopital} />
           ))}
 
-        {/* Marqueurs des ambulances */}
         {filteredAmbulances.map((ambulance) => (
           <AmbulanceMarker
             key={ambulance.id}
@@ -84,7 +78,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
         ))}
       </MapContainer>
 
-      {/* Bouton pour afficher/masquer les détails - avec position fixe */}
       <div className="absolute bottom-4 right-4 z-[60]">
         <ControlButton
           showDetails={showDetails}

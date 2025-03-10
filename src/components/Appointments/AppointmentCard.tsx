@@ -82,6 +82,16 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
     onEdit(appointment.id);
   };
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR', { 
+      weekday: 'long', 
+      day: 'numeric', 
+      month: 'long', 
+      year: 'numeric' 
+    }).replace(/^./, char => char.toUpperCase());
+  };
+
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow">
       <div className="flex flex-wrap justify-between items-start gap-4">
@@ -103,16 +113,20 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
         </div>
         
         {/* Pickup information */}
-        <div className="flex-1 min-w-[250px]">
-          <div className="text-sm font-medium">Départ</div>
-          <div className="text-sm text-gray-800">{appointment.pickupAddress}</div>
-          <div className="flex items-center mt-1 text-sm text-gray-600">
-            <Calendar size={14} className="mr-1" />
-            {appointment.pickupDate}
-            <Clock size={14} className="ml-2 mr-1" />
-            {appointment.pickupTime}
-          </div>
-        </div>
+       <div className="flex-1 min-w-[250px]">
+  <div className="text-sm font-medium">Départ</div>
+  <div className="text-sm text-gray-800">{appointment.pickupAddress}</div>
+  <div className="flex flex-col mt-1 text-sm text-gray-600">
+    <div className="flex items-center">
+      <Calendar size={14} className="mr-2" />
+      {formatDate(appointment.pickupDate)}
+    </div>
+    <div className="flex items-center mt-1">
+      <Clock size={14} className="mr-2" />
+      Heure du RDV : {appointment.pickupTime}
+    </div>
+  </div>
+</div>
         
         {/* Destination information */}
         <div className="flex-1 min-w-[250px]">

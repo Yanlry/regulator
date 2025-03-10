@@ -19,10 +19,9 @@ import AmbulanceCard from "./AmbulanceCard";
 import RevisionDetails from "./RevisionDetails";
 import SearchAndFilters from "./SearchAndFilters";
 import StatsDashboard from "./StatsDashboard";
-import LoadingSpinner from "../Common/LoadingSpinner";
+import LoadingSpinner from "../../Common/LoadingSpinner";
 
 const Ambulances: React.FC<AmbulancesProps> = ({ isOpen }) => {
-  // State Management
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [maintenanceFilter, setMaintenanceFilter] = useState("all");
@@ -30,11 +29,9 @@ const Ambulances: React.FC<AmbulancesProps> = ({ isOpen }) => {
   const [showStats, setShowStats] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Data Loading Effect
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Simulate data loading
         await new Promise(resolve => setTimeout(resolve, 1000));
         setIsLoading(false);
       } catch (error) {
@@ -46,7 +43,6 @@ const Ambulances: React.FC<AmbulancesProps> = ({ isOpen }) => {
     loadData();
   }, []);
 
-  // Memoized Stats Calculation
   const stats = useMemo(() => {
     const totalVehicles = ambulancesData.length;
     const inService = ambulancesData.filter(a => a.status === "En service").length;
@@ -70,7 +66,6 @@ const Ambulances: React.FC<AmbulancesProps> = ({ isOpen }) => {
     };
   }, []);
 
-  // Memoized Filtered Ambulances
   const filteredAmbulances = useMemo(() => {
     return ambulancesData.filter((ambulance) => {
       const matchesSearch = [
@@ -99,19 +94,15 @@ const Ambulances: React.FC<AmbulancesProps> = ({ isOpen }) => {
     });
   }, [search, filter, maintenanceFilter]);
 
-  // Action Handlers
   const handleRefresh = useCallback(() => {
-    // Implement actual data refresh logic
     console.log("Rafraîchir les données");
   }, []);
 
   const handleScheduleMaintenance = useCallback(() => {
-    // Implement maintenance scheduling logic
     console.log("Planifier un entretien");
   }, []);
 
   const handleAddVehicle = useCallback(() => {
-    // Implement vehicle addition logic
     console.log("Ajouter un véhicule");
   }, []);
 
@@ -133,7 +124,6 @@ const Ambulances: React.FC<AmbulancesProps> = ({ isOpen }) => {
         <LoadingSpinner isOpen={isOpen} />
       ) : (
         <>
-          {/* Header */}
           <header className="bg-white shadow-md p-4 sticky top-0 z-50">
             <div className="container mx-auto flex justify-between items-center">
               <div className="flex items-center gap-4">
@@ -187,12 +177,9 @@ const Ambulances: React.FC<AmbulancesProps> = ({ isOpen }) => {
             </div>
           </header>
           
-          {/* Main Content */}
           <main className="container mx-auto p-4 space-y-6 max-w-7xl">
-            {/* Conditionally render stats */}
             {showStats && <StatsDashboard stats={stats} />}
 
-            {/* Search and Filters */}
             <SearchAndFilters
               search={search}
               setSearch={setSearch}
@@ -202,7 +189,6 @@ const Ambulances: React.FC<AmbulancesProps> = ({ isOpen }) => {
               setMaintenanceFilter={setMaintenanceFilter}
             />
 
-            {/* Vehicle List or Details */}
             {selectedAmbulance ? (
               <RevisionDetails
                 ambulance={selectedAmbulance}

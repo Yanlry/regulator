@@ -24,13 +24,13 @@ interface SidebarProps {
   toggleSidebar: () => void;
 }
 
-// Navigation Section Configuration
 const navigationSections = [
   {
     title: "Gestion de la régulation",
     items: [
       { icon: Home, label: "Tableau de bord", path: "/" },
       { icon: Command, label: "Régulation", path: "/regulation" },
+      { icon: PlusCircle, label: "Rendez-vous", path: "/appointments" },
       { icon: Users, label: "Équipes", path: "/equipes" },
       { icon: MapPin, label: "Localisation", path: "/localisation" },
     ],
@@ -42,7 +42,6 @@ const navigationSections = [
   {
     title: "Gestion des Patients",
     items: [
-      { icon: PlusCircle, label: "Rendez-vous", path: "/appointments" },
       { icon: List, label: "Liste des patients", path: "/liste-patients" },
     ],
   },
@@ -65,22 +64,18 @@ const navigationSections = [
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
-  // État pour le menu de paramètres
+
   const [settingsOpen, setSettingsOpen] = useState(false);
-  // État pour l'option de fermeture automatique
   const [autoClose, setAutoClose] = useState(false);
 
-  // Référence pour détecter les clics en dehors du menu de paramètres
   const settingsRef = useRef<HTMLDivElement>(null);
 
-  // Gestionnaire pour les clics sur les éléments du menu
   const handleMenuClick = () => {
     if (isOpen && autoClose) {
       toggleSidebar();
     }
   };
 
-  // Gestionnaire pour fermer le menu des paramètres lors de clics externes
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -108,9 +103,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         ${isOpen ? "w-64" : "w-16"}
       `}
     >
-      {/* Fixed Header Section */}
       <div className={`${isOpen ? "p-4 pt-6 pb-2" : "p-2 pt-6 pb-2"}`}>
-        {/* Sidebar Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <button
@@ -127,8 +120,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             )}
           </div>
 
-          {/* Icône de paramètres (clé à molette) */}
-          {/* Icône de paramètres (clé à molette) - visible uniquement quand la sidebar est ouverte */}
           {isOpen && (
             <div className="relative ml-1" ref={settingsRef}>
               <button
@@ -142,7 +133,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                 />
               </button>
 
-              {/* Menu déroulant des paramètres */}
               {settingsOpen && (
                 <div className="absolute right-0 mt-2 w-64 bg-gray-800 rounded-md shadow-lg z-50 text-sm">
                   <div className="p-3 border-b border-gray-700">
@@ -167,7 +157,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
           )}
         </div>
 
-        {/* Search Bar */}
         {isOpen && (
           <div className="mb-4">
             <input
@@ -187,7 +176,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         )}
       </div>
 
-      {/* Scrollable Navigation Section */}
       <div
         className={`
         flex-1 overflow-y-auto custom-scrollbar
@@ -276,7 +264,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         </div>
       </div>
 
-      {/* Fixed Footer Section */}
       <div className={`${isOpen ? "p-4 pt-2" : "p-2 pt-2"}`}>
         <button
           onClick={() => {

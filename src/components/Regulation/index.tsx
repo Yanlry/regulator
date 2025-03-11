@@ -3,7 +3,7 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useScheduleData } from "./hooks/useScheduleData";
 import { useDragPreview } from "./hooks/useDragPreview";
-import LoadingSpinner from "../../Common/LoadingSpinner";
+import LoadingSpinner from "../../common/LoadingSpinner";
 import ScheduleHeader from "../Regulation/ScheduleHeader";
 import UnassignedArea from "../Regulation/UnassignedArea";
 import ScheduleGrid from "../Regulation/ScheduleGrid";

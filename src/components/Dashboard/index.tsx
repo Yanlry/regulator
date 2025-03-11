@@ -24,7 +24,8 @@ import ReturnsList from "./ReturnsList";
 import TransportTable from "./TransportTable";
 import InterventionSummary from "./InterventionSummary";
 import ProximityTransport from "./ProximityTransport";
-import LoadingSpinner from "../../Common/LoadingSpinner";
+import LoadingSpinner from "../../common/LoadingSpinner";
+import { useTheme } from "../../contexts/ThemeContext";
 import {
   GripVertical,
   Eye,
@@ -64,11 +65,13 @@ function SortableWidget({
   children,
   className = "",
   minHeight = "300px",
+  theme,
 }: {
   id: string;
   children: React.ReactNode;
   className?: string;
   minHeight?: string;
+  theme: string;
 }) {
   const {
     attributes,
@@ -89,17 +92,31 @@ function SortableWidget({
     position: "relative" as const,
   };
 
+  const dragHandleClasses = `
+    absolute top-3 right-3 z-10 p-1.5 rounded-md shadow-sm opacity-0 group-hover:opacity-100 transition-opacity cursor-grab
+    ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}
+  `;
+
+  const dragHandleIconClasses = `
+    ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}
+  `;
+
+  const widgetClasses = `
+    h-full w-full rounded-lg shadow overflow-hidden flex flex-col
+    ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}
+  `;
+
   return (
     <div ref={setNodeRef} style={style} className={`group h-full ${className}`}>
       <div
-        className="absolute top-3 right-3 z-10 p-1.5 rounded-md bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity cursor-grab"
+        className={dragHandleClasses}
         {...attributes}
         {...listeners}
       >
-        <GripVertical size={16} className="text-gray-500" />
+        <GripVertical size={16} className={dragHandleIconClasses} />
       </div>
       <div
-        className="h-full w-full bg-white rounded-lg shadow overflow-hidden flex flex-col"
+        className={widgetClasses}
         style={{ minHeight }}
       >
         {children}
@@ -112,25 +129,42 @@ function AdaptiveWidgetContent({
   children,
   title,
   id,
+  theme,
 }: {
   children: React.ReactNode;
   title: string;
   id: string;
+  theme: string;
 }) {
+  const headerClasses = `
+    flex justify-between items-center p-4 border-b
+    ${theme === 'dark' ? 'border-gray-600' : 'border-gray-100'}
+  `;
+
+  const titleClasses = `
+    text-lg font-bold flex items-center
+    ${theme === 'dark' ? 'text-white' : 'text-gray-800'}
+  `;
+
+  const contentClasses = `
+    flex-grow p-4 overflow-auto
+    ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}
+  `;
+
   return (
     <div className="flex flex-col h-full w-full" data-widget-id={id}>
-      <div className="flex justify-between items-center p-4 border-b border-gray-100">
-        <h2 className="text-lg font-bold text-gray-800 flex items-center">
+      <div className={headerClasses}>
+        <h2 className={titleClasses}>
           <span className="bg-blue-500 w-1 h-5 rounded mr-2"></span>
           {title}
         </h2>
       </div>
-      <div className="flex-grow p-4 overflow-auto">{children}</div>
+      <div className={contentClasses}>{children}</div>
     </div>
   );
 }
 
-function CombinedReturnsList() {
+function CombinedReturnsList({ theme }: { theme: string }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
       <ReturnsList
@@ -138,16 +172,18 @@ function CombinedReturnsList() {
         count={pendingReturns.length}
         description="Patients en attente"
         iconColor="text-red-600"
-        bgColor="bg-red-100"
+        bgColor={theme === 'dark' ? "bg-red-900" : "bg-red-100"}
         patients={pendingReturns}
+        theme={theme}
       />
       <ReturnsList
         title="Retours à prévoir"
         count={upcomingReturns.length}
         description="Retours programmés dans les 3h"
         iconColor="text-orange-600"
-        bgColor="bg-orange-100"
+        bgColor={theme === 'dark' ? "bg-orange-900" : "bg-orange-100"}
         patients={upcomingReturns}
+        theme={theme}
       />
     </div>
   );
@@ -158,23 +194,73 @@ function WidgetFilter({
   onToggleWidget,
   onToggleAll,
   onClose,
+  theme,
 }: {
   widgets: DashboardWidget[];
   onToggleWidget: (id: string) => void;
   onToggleAll: (visible: boolean) => void;
   onClose: () => void;
+  theme: string;
 }) {
   const allVisible = widgets.every((widget) => widget.visible);
   const anyVisible = widgets.some((widget) => widget.visible);
 
+  const containerClasses = `
+    absolute top-16 right-4 shadow-lg rounded-lg p-4 w-80 z-20 border
+    ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200'}
+  `;
+
+  const headerClasses = `
+    flex justify-between items-center mb-4 pb-2
+    ${theme === 'dark' ? 'border-b border-gray-600' : 'border-b border-gray-200'}
+  `;
+
+  const titleClasses = `
+    font-medium flex items-center
+    ${theme === 'dark' ? 'text-white' : 'text-gray-800'}
+  `;
+
+  const closeButtonClasses = `
+    ${theme === 'dark' ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'}
+  `;
+
+  const showAllButtonClasses = `
+    px-3 py-1.5 text-sm rounded
+    ${allVisible
+      ? theme === 'dark' ? 'bg-blue-700 text-blue-100' : 'bg-blue-100 text-blue-700'
+      : theme === 'dark' ? 'bg-gray-600 text-gray-200 hover:bg-gray-500' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+    }
+  `;
+
+  const hideAllButtonClasses = `
+    px-3 py-1.5 text-sm rounded
+    ${!anyVisible
+      ? theme === 'dark' ? 'bg-blue-700 text-blue-100' : 'bg-blue-100 text-blue-700'
+      : theme === 'dark' ? 'bg-gray-600 text-gray-200 hover:bg-gray-500' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+    }
+  `;
+
+  const widgetItemClasses = (visible: boolean) => `
+    flex items-center p-2 rounded cursor-pointer
+    ${visible ? 'opacity-100' : 'opacity-70'}
+    ${theme === 'dark' ? 'hover:bg-gray-600' : 'hover:bg-gray-50'}
+  `;
+
+  const widgetTextClasses = (visible: boolean) => `
+    ${visible 
+      ? theme === 'dark' ? 'text-white' : 'text-gray-800' 
+      : theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+    }
+  `;
+
   return (
-    <div className="absolute top-16 right-4 bg-white shadow-lg rounded-lg p-4 w-80 z-20 border border-gray-200">
-      <div className="flex justify-between items-center mb-4 border-b pb-2">
-        <h3 className="font-medium text-gray-800 flex items-center">
+    <div className={containerClasses}>
+      <div className={headerClasses}>
+        <h3 className={titleClasses}>
           <Filter size={16} className="mr-2" />
           Affichage des widgets
         </h3>
-        <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+        <button onClick={onClose} className={closeButtonClasses}>
           <X size={18} />
         </button>
       </div>
@@ -182,21 +268,13 @@ function WidgetFilter({
       <div className="mb-4 flex space-x-2">
         <button
           onClick={() => onToggleAll(true)}
-          className={`px-3 py-1.5 text-sm rounded ${
-            allVisible
-              ? "bg-blue-100 text-blue-700"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-          }`}
+          className={showAllButtonClasses}
         >
           <Eye size={14} className="inline mr-1" /> Tout afficher
         </button>
         <button
           onClick={() => onToggleAll(false)}
-          className={`px-3 py-1.5 text-sm rounded ${
-            !anyVisible
-              ? "bg-blue-100 text-blue-700"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-          }`}
+          className={hideAllButtonClasses}
           disabled={!anyVisible}
         >
           <EyeOff size={14} className="inline mr-1" /> Tout masquer
@@ -207,19 +285,15 @@ function WidgetFilter({
         {widgets.map((widget) => (
           <div
             key={widget.id}
-            className={`flex items-center p-2 rounded hover:bg-gray-50 cursor-pointer ${
-              widget.visible ? "opacity-100" : "opacity-70"
-            }`}
+            className={widgetItemClasses(widget.visible)}
             onClick={() => onToggleWidget(widget.id)}
           >
             {widget.visible ? (
               <CheckSquare size={18} className="mr-3 text-blue-600" />
             ) : (
-              <Square size={18} className="mr-3 text-gray-400" />
+              <Square size={18} className={`mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} />
             )}
-            <span
-              className={widget.visible ? "text-gray-800" : "text-gray-500"}
-            >
+            <span className={widgetTextClasses(widget.visible)}>
               {widget.title}
             </span>
           </div>
@@ -230,6 +304,9 @@ function WidgetFilter({
 }
 
 const Dashboard: React.FC<DashboardProps> = () => {
+  // Get current theme from context
+  const { theme } = useTheme();
+  
   const [windowSize, setWindowSize] = useState({
     width: typeof window !== "undefined" ? window.innerWidth : 0,
     height: typeof window !== "undefined" ? window.innerHeight : 0,
@@ -270,7 +347,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
       id: "stat-cards",
       title: "Statistiques",
       size: "full-width",
-      component: <StatCards />,
+      component: <StatCards theme={theme} />,
       order: 1,
       minHeight: "150px",
       visible: true,
@@ -279,7 +356,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
       id: "returns-combined",
       title: "Retours",
       size: "full-width",
-      component: <CombinedReturnsList />,
+      component: <CombinedReturnsList theme={theme} />,
       order: 2,
       minHeight: "250px",
       visible: true,
@@ -288,7 +365,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
       id: "transport-table",
       title: "Transports de la journée",
       size: "full-width",
-      component: <TransportTable transports={transportsData} />,
+      component: <TransportTable transports={transportsData} theme={theme} />,
       order: 3,
       minHeight: "400px",
       visible: true,
@@ -298,7 +375,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
       title: "Suivi des ambulances",
       size: "three-quarters",
       component: (
-        <AmbulanceTracking stats={ambulanceStatsData} activities={[]} />
+        <AmbulanceTracking stats={ambulanceStatsData} activities={[]} theme={theme} />
       ),
       order: 4,
       minHeight: "500px",
@@ -308,7 +385,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
       id: "notifications",
       title: "Notifications",
       size: "one-quarter",
-      component: <Notifications />,
+      component: <Notifications theme={theme} />,
       order: 5,
       minHeight: "500px",
       visible: true,
@@ -317,7 +394,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
       id: "intervention-summary",
       title: "Résumé des interventions",
       size: "half-width",
-      component: <InterventionSummary />,
+      component: <InterventionSummary theme={theme} />,
       order: 6,
       minHeight: "350px",
       visible: true,
@@ -326,7 +403,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
       id: "transport-volume",
       title: "Volume de transport",
       size: "half-width",
-      component: <TransportVolume />,
+      component: <TransportVolume theme={theme} />,
       order: 7,
       minHeight: "350px",
       visible: true,
@@ -335,12 +412,51 @@ const Dashboard: React.FC<DashboardProps> = () => {
       id: "proximity-transport",
       title: "Transports à proximité",
       size: "full-width",
-      component: <ProximityTransport transports={transportsData} />,
+      component: <ProximityTransport transports={transportsData} theme={theme} />,
       order: 8,
       minHeight: "350px",
       visible: true,
     },
   ]);
+
+  // Re-update widget components when theme changes
+  useEffect(() => {
+    setWidgets(prevWidgets => 
+      prevWidgets.map(widget => {
+        // Create a new component instance with the updated theme
+        let updatedComponent;
+        switch (widget.id) {
+          case "stat-cards":
+            updatedComponent = <StatCards theme={theme} />;
+            break;
+          case "returns-combined":
+            updatedComponent = <CombinedReturnsList theme={theme} />;
+            break;
+          case "transport-table":
+            updatedComponent = <TransportTable transports={transportsData} theme={theme} />;
+            break;
+          case "ambulance-tracking":
+            updatedComponent = <AmbulanceTracking stats={ambulanceStatsData} activities={[]} theme={theme} />;
+            break;
+          case "notifications":
+            updatedComponent = <Notifications theme={theme} />;
+            break;
+          case "intervention-summary":
+            updatedComponent = <InterventionSummary theme={theme} />;
+            break;
+          case "transport-volume":
+            updatedComponent = <TransportVolume theme={theme} />;
+            break;
+          case "proximity-transport":
+            updatedComponent = <ProximityTransport transports={transportsData} theme={theme} />;
+            break;
+          default:
+            updatedComponent = widget.component;
+        }
+        return { ...widget, component: updatedComponent };
+      })
+    );
+  }, [theme]);
 
   const toggleWidgetVisibility = (id: string) => {
     setWidgets(
@@ -493,11 +609,12 @@ const Dashboard: React.FC<DashboardProps> = () => {
                 id={widget.id}
                 className={`${colSpanClass} h-full`}
                 minHeight={widget.minHeight}
+                theme={theme}
               >
                 {widget.id === "proximity-transport" ? (
                   widget.component
                 ) : (
-                  <AdaptiveWidgetContent title={widget.title} id={widget.id}>
+                  <AdaptiveWidgetContent title={widget.title} id={widget.id} theme={theme}>
                     {widget.component}
                   </AdaptiveWidgetContent>
                 )}
@@ -508,31 +625,35 @@ const Dashboard: React.FC<DashboardProps> = () => {
       );
     });
   };
+
+  // Theme-specific classes
+  const containerClasses = `
+    transition-all duration-300 min-h-screen
+    ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}
+  `;
+  
+  const dashboardContainerClasses = `
+    transition-all duration-300 min-h-screen p-4
+    ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}
+  `;
  
   if (isLoading) {
     return (
-      <div className={`
-        transition-all duration-300 
-        bg-gray-100 min-h-screen 
-      `}>
+      <div className={containerClasses}>
         <LoadingSpinner />
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen w-full bg-gray-100">
-     <div
-      className={`
-        transition-all duration-300 
-        bg-gray-100 min-h-screen p-4
-      `}
-    >
+    <div className={`flex min-h-screen w-full ${containerClasses}`}>
+      <div className={dashboardContainerClasses}>
         {/* Header avec bouton de filtre de widgets */}
         <div className="mb-4">
           <Header
             showWidgetFilter={showWidgetFilter}
             setShowWidgetFilter={setShowWidgetFilter}
+            theme={theme}
           />
 
           {/* Filtre de widgets */}
@@ -542,19 +663,10 @@ const Dashboard: React.FC<DashboardProps> = () => {
               onToggleWidget={toggleWidgetVisibility}
               onToggleAll={toggleAllWidgetsVisibility}
               onClose={() => setShowWidgetFilter(false)}
+              theme={theme}
             />
           )}
         </div>
-
-        {/* Filtre de widgets (doublon - à supprimer) */}
-        {showWidgetFilter && (
-          <WidgetFilter
-            widgets={widgets}
-            onToggleWidget={toggleWidgetVisibility}
-            onToggleAll={toggleAllWidgetsVisibility}
-            onClose={() => setShowWidgetFilter(false)}
-          />
-        )}
 
         {/* Widgets réorganisables */}
         <DndContext

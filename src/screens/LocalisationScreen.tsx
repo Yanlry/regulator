@@ -2,11 +2,11 @@ import { useState, useEffect, useCallback } from "react";
 import FilterBar from "../components/Localisation/FilterBar/FilterBar";
 import MapComponent from "../components/Localisation/Map/MapComponent";
 import DetailPanel from "../components/Localisation/DetailPanel/DetailPanel";
-import LoadingSpinner from "../Common/LoadingSpinner";
+import LoadingSpinner from "../common/LoadingSpinner";
 import { calculerStatistiques } from "../components/Localisation/data/statistics";
 import { ambulances } from "../components/Localisation/data/ambulances";
 import { FilterOptions } from "../components/Localisation/data/types";
-import { useSidebar } from "../components/Sidebar";
+import { useSidebar } from "../contexts/useSidebar";
 
 /**
  * Props du composant LocalisationScreen

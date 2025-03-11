@@ -1,5 +1,7 @@
+import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Sidebar, SidebarProvider, useSidebar } from "./components/Sidebar";
+import Sidebar from "./components/Sidebar/Sidebar";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import Dashboard from "./screens/DashboardScreen";
 import AmbulancesScreen from "./screens/AmbulancesScreen";
 import LocalisationScreen from "./screens/LocalisationScreen";
@@ -10,54 +12,49 @@ import AppointmentsScreen from "./screens/AppointmentsScreen";
 import RegulationScreen from "./screens/RegulationScreen"; 
 import RhScreen from "./screens/RhScreen"; 
 import RecrutementScreen from "./screens/RecrutementScreen";
+import ThemedComponent from "./contexts/ThemedComponent";
 
-/**
- * Conteneur d'application qui s'adapte à l'état de la sidebar
- */
 const AppContent = () => {
-  // Utilise le hook pour accéder à l'état de la sidebar
-  const { isOpen } = useSidebar();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const contentStyles = {
+    marginLeft: sidebarOpen ? '16rem' : '4rem',
+    width: `calc(100% - ${sidebarOpen ? '16rem' : '4rem'})`,
+    transition: 'all 0.3s ease-in-out'
+  };
   
   return (
-    <div className="flex h-screen">
-      {/* Sidebar avec ouverture au survol */}
-      <Sidebar />
+    <ThemedComponent type="container" className="flex h-screen">
+      <Sidebar onOpenChange={setSidebarOpen} />
       
-      {/* Conteneur principal qui s'ajuste automatiquement */}
       <div 
-        className={`
-          flex-1 
-          transition-all duration-300
-        `}
-        style={{ 
-          marginLeft: isOpen ? '16rem' : '4rem',
-          width: `calc(100% - ${isOpen ? '16rem' : '4rem'})` 
-        }}
+        className="flex-1 transition-all duration-300"
+        style={contentStyles}
       >
         <Routes>
-          <Route path="/" element={<Dashboard isOpen={isOpen} />} />
-          <Route path="/ambulances" element={<AmbulancesScreen isOpen={isOpen} />} />
-          <Route path="/localisation" element={<LocalisationScreen isOpen={isOpen} />} />
-          <Route path="/planning" element={<PlanningScreen isOpen={isOpen} />} /> 
-          <Route path="/equipes" element={<EquipesScreen isOpen={isOpen} />} /> 
-          <Route path="/appointments" element={<AppointmentsScreen isOpen={isOpen} />} />
-          <Route path="/appointments/new" element={<NewAppointmentScreen isOpen={isOpen} />} /> 
-          <Route path="/regulation" element={<RegulationScreen isOpen={isOpen} />} /> 
-          <Route path="/rh" element={<RhScreen isOpen={isOpen} />} /> 
-          <Route path="/recrutement" element={<RecrutementScreen isOpen={isOpen} />} /> 
+          <Route path="/" element={<Dashboard isOpen={sidebarOpen} />} />
+          <Route path="/ambulances" element={<AmbulancesScreen isOpen={sidebarOpen} />} />
+          <Route path="/localisation" element={<LocalisationScreen isOpen={sidebarOpen} />} />
+          <Route path="/planning" element={<PlanningScreen isOpen={sidebarOpen} />} /> 
+          <Route path="/equipes" element={<EquipesScreen isOpen={sidebarOpen} />} /> 
+          <Route path="/appointments" element={<AppointmentsScreen isOpen={sidebarOpen} />} />
+          <Route path="/appointments/new" element={<NewAppointmentScreen isOpen={sidebarOpen} />} /> 
+          <Route path="/regulation" element={<RegulationScreen isOpen={sidebarOpen} />} /> 
+          <Route path="/rh" element={<RhScreen isOpen={sidebarOpen} />} /> 
+          <Route path="/recrutement" element={<RecrutementScreen isOpen={sidebarOpen} />} /> 
         </Routes>
       </div>
-    </div>
+    </ThemedComponent>
   );
 };
 
 const App = () => {
   return (
-    <SidebarProvider>
+    <ThemeProvider>
       <Router>
         <AppContent />
       </Router>
-    </SidebarProvider>
+    </ThemeProvider>
   );
 };
 

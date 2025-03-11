@@ -21,25 +21,26 @@ import { materielAmbulance, materielVSL } from './data';
 interface RevisionDetailsProps {
   ambulance: Ambulance;
   onClose: () => void;
+  theme: string;
 }
 
-const RevisionDetails: React.FC<RevisionDetailsProps> = ({ ambulance, onClose }) => {
+const RevisionDetails: React.FC<RevisionDetailsProps> = ({ ambulance, onClose, theme }) => {
   const [materielObligatoire] = useState(
     ambulance.type === "VSL" ? materielVSL : materielAmbulance
   );
-  const [datesPeremption, setDatesPeremption] = useState<
-    Record<number, string>
-  >({});
+  
+  // Fixed syntax for state declaration
+  const [datesPeremption, setDatesPeremption] = useState<Record<number, string>>({});
   const [editingField, setEditingField] = useState<string | null>(null);
   const [tempValue, setTempValue] = useState<string>("");
 
   useEffect(() => {
-    setDatesPeremption(
-      materielObligatoire.reduce((acc, item) => {
-        acc[item.id] = "";
-        return acc;
-      }, {} as Record<number, string>)
-    );
+    // Initialize dates with empty strings
+    const initialDates: Record<number, string> = {};
+    materielObligatoire.forEach(item => {
+      initialDates[item.id] = "";
+    });
+    setDatesPeremption(initialDates);
   }, [materielObligatoire]);
 
   const handleEditClick = (field: keyof Ambulance) => {
@@ -68,99 +69,208 @@ const RevisionDetails: React.FC<RevisionDetailsProps> = ({ ambulance, onClose })
   };
 
   const handleDateChange = (id: number, date: string) => {
-    setDatesPeremption((prev) => ({
+    setDatesPeremption(prev => ({
       ...prev,
       [id]: date,
     }));
   };
 
+  // Theme-specific classes
+  const containerClasses = `
+    p-6 rounded-lg shadow-lg space-y-6
+    ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}
+  `;
+
+  const titleClasses = `
+    text-2xl font-bold flex items-center gap-2
+    ${theme === 'dark' ? 'text-white' : 'text-gray-800'}
+  `;
+
+  const closeButtonClasses = `
+    px-4 py-2 rounded-lg text-sm
+    transition-colors flex items-center
+    border
+    ${theme === 'dark' 
+      ? 'bg-gray-600 text-gray-200 hover:bg-gray-500 border-gray-500' 
+      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-gray-300'}
+  `;
+
+  const infoGridClasses = `
+    grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4 rounded-lg shadow-md
+    ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}
+  `;
+
+  const infoItemClasses = `
+    flex items-center space-x-2 p-3 rounded-md border transition
+    ${theme === 'dark' 
+      ? 'bg-gray-600 border-gray-500 hover:bg-gray-500' 
+      : 'bg-gray-50 border-gray-200 hover:bg-gray-100'}
+  `;
+
+  const infoLabelClasses = `
+    text-sm font-semibold
+    ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}
+  `;
+
+  const infoValueClasses = `
+    block text-md
+    ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}
+  `;
+
+  const detailsGridClasses = `
+    grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-4 rounded-lg shadow-md
+    ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}
+  `;
+
+  const detailItemClasses = `
+    flex items-center gap-4 p-4 rounded-md border transition
+    ${theme === 'dark' 
+      ? 'bg-gray-600 border-gray-500 hover:bg-gray-500' 
+      : 'bg-gray-50 border-gray-200 hover:bg-gray-100'}
+  `;
+
+  const inputClasses = `
+    text-sm border-b-2 transition-all w-full outline-none py-1
+    ${theme === 'dark' 
+      ? 'text-white bg-gray-600 border-gray-500 focus:border-blue-400' 
+      : 'text-gray-800 bg-transparent border-gray-400 focus:border-blue-500'}
+  `;
+
+  const detailLabelClasses = `
+    text-md font-semibold
+    ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}
+  `;
+
+  const detailValueClasses = `
+    text-sm cursor-pointer transition
+    ${theme === 'dark' 
+      ? 'text-gray-300 hover:text-blue-400' 
+      : 'text-gray-600 hover:text-blue-600'}
+  `;
+
+  const editButtonClasses = `
+    p-1 transition
+    ${theme === 'dark' 
+      ? 'text-gray-400 hover:text-blue-400' 
+      : 'text-gray-400 hover:text-blue-500'}
+  `;
+
+  const saveButtonClasses = `
+    p-1 transition
+    ${theme === 'dark' ? 'text-green-400 hover:text-green-500' : 'text-green-500 hover:text-green-700'}
+  `;
+
+  const cancelButtonClasses = `
+    p-1 transition
+    ${theme === 'dark' ? 'text-red-400 hover:text-red-500' : 'text-red-500 hover:text-red-700'}
+  `;
+
+  const materielContainerClasses = `
+    p-4 rounded-lg shadow-sm
+    ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-50'}
+  `;
+
+  const materielTitleClasses = `
+    text-md font-semibold flex items-center gap-2
+    ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}
+  `;
+
+  const materielItemClasses = `
+    flex justify-between items-center p-3 rounded-lg border shadow-sm
+    ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200'}
+  `;
+
+  const materielLabelClasses = `
+    text-sm font-medium
+    ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}
+  `;
+
+  const materielInputClasses = `
+    border rounded-lg p-2 text-sm
+    ${theme === 'dark' 
+      ? 'bg-gray-600 border-gray-500 text-white' 
+      : 'bg-white border-gray-300 text-gray-700'}
+  `;
+
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg space-y-6">
-     <div className="flex justify-between items-center mb-6">
-  <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-    {ambulance.type === "Ambulance" ? "🚑" : "🚗"} Détails de {ambulance.id}
-  </h2>
-  <button
-    onClick={onClose}
-    className="
-      px-4 py-2 
-      bg-gray-100 text-gray-700 
-      rounded-lg 
-      hover:bg-gray-200 
-      transition-colors 
-      flex items-center 
-      text-sm
-      border border-gray-300
-    "
-  >
-    <X className="mr-2 w-4 h-4" /> Fermer
-  </button>
-</div>
+    <div className={containerClasses}>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className={titleClasses}>
+          {ambulance.type === "Ambulance" ? "🚑" : "🚗"} Détails de {ambulance.id}
+        </h2>
+        <button
+          onClick={onClose}
+          className={closeButtonClasses}
+        >
+          <X className="mr-2 w-4 h-4" /> Fermer
+        </button>
+      </div>
+      
       {/* Informations supplémentaires */}
       <div className="space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-white p-4 rounded-lg shadow-md">
-          <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md border border-gray-200 hover:bg-gray-100 transition">
+        <div className={infoGridClasses}>
+          <div className={infoItemClasses}>
             <Car size={18} className="text-blue-500" />
             <div>
-              <strong className="text-sm font-semibold text-gray-700">
+              <strong className={infoLabelClasses}>
                 Modèle :
               </strong>
-              <span className="block text-md text-gray-800">
+              <span className={infoValueClasses}>
                 {ambulance.modele}
               </span>
             </div>
           </div>
-          <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md border border-gray-200 hover:bg-gray-100 transition">
+          <div className={infoItemClasses}>
             <FileText size={18} className="text-green-500" />
             <div>
-              <strong className="text-sm font-semibold text-gray-700">
+              <strong className={infoLabelClasses}>
                 Immatriculation :
               </strong>
-              <span className="block text-md text-gray-800">
+              <span className={infoValueClasses}>
                 {ambulance.immatriculation}
               </span>
             </div>
           </div>
-          <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md border border-gray-200 hover:bg-gray-100 transition">
+          <div className={infoItemClasses}>
             <CheckCircle size={18} className="text-teal-500" />
             <div>
-              <strong className="text-sm font-semibold text-gray-700">
+              <strong className={infoLabelClasses}>
                 Statut :
               </strong>
-              <span className="block text-md text-gray-800">
+              <span className={infoValueClasses}>
                 {ambulance.status}
               </span>
             </div>
           </div>
-          <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md border border-gray-200 hover:bg-gray-100 transition">
+          <div className={infoItemClasses}>
             <MapPin size={18} className="text-red-500" />
             <div>
-              <strong className="text-sm font-semibold text-gray-700">
+              <strong className={infoLabelClasses}>
                 Localisation :
               </strong>
-              <span className="block text-md text-gray-800">
+              <span className={infoValueClasses}>
                 {ambulance.localisation}
               </span>
             </div>
           </div>
-          <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md border border-gray-200 hover:bg-gray-100 transition">
+          <div className={infoItemClasses}>
             <Gauge size={18} className="text-purple-500" />
             <div>
-              <strong className="text-sm font-semibold text-gray-700">
+              <strong className={infoLabelClasses}>
                 Kilométrage :
               </strong>
-              <span className="block text-md text-gray-800">
+              <span className={infoValueClasses}>
                 {ambulance.kilometrage} km
               </span>
             </div>
           </div>
-          <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md border border-gray-200 hover:bg-gray-100 transition">
+          <div className={infoItemClasses}>
             <Droplet size={18} className="text-yellow-500" />
             <div>
-              <strong className="text-sm font-semibold text-gray-700">
+              <strong className={infoLabelClasses}>
                 Carburant :
               </strong>
-              <span className="block text-md text-gray-800">
+              <span className={infoValueClasses}>
                 {ambulance.carburant}
               </span>
             </div>
@@ -168,7 +278,7 @@ const RevisionDetails: React.FC<RevisionDetailsProps> = ({ ambulance, onClose })
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-4 bg-white rounded-lg shadow-md">
+      <div className={detailsGridClasses}>
         {[
           { label: "Pneus", field: "pneus", icon: <Circle size={20} className="text-blue-500" /> },
           { label: "Freins", field: "freins", icon: <Disc size={20} className="text-red-500" /> },
@@ -178,7 +288,7 @@ const RevisionDetails: React.FC<RevisionDetailsProps> = ({ ambulance, onClose })
           { label: "Contrôle technique", field: "ct", icon: <ShieldCheck size={20} className="text-purple-500" /> },
           { label: "Disponibilité", field: "disponibilite", icon: <CheckCircle size={20} className="text-teal-500" /> },
         ].map(({ label, field, icon }) => (
-          <div key={field} className="flex items-center gap-4 p-4 bg-gray-50 rounded-md border border-gray-200 hover:bg-gray-100 transition">
+          <div key={field} className={detailItemClasses}>
             <span className="text-xl">{icon}</span>
             {editingField === field ? (
               <div className="flex items-center gap-2 w-full">
@@ -186,26 +296,26 @@ const RevisionDetails: React.FC<RevisionDetailsProps> = ({ ambulance, onClose })
                   type="text"
                   value={tempValue}
                   onChange={(e) => setTempValue(e.target.value)}
-                  className="text-sm text-gray-800 border-b-2 border-gray-400 focus:border-blue-500 transition-all w-full outline-none py-1"
+                  className={inputClasses}
                 />
                 <button
                   onClick={() => handleSave(field as keyof Ambulance)}
-                  className="p-1 text-green-500 hover:text-green-700 transition"
+                  className={saveButtonClasses}
                 >
                   <Check size={20} />
                 </button>
                 <button
                   onClick={handleCancel}
-                  className="p-1 text-red-500 hover:text-red-700 transition"
+                  className={cancelButtonClasses}
                 >
                   <X size={20} />
                 </button>
               </div>
             ) : (
               <div className="flex flex-col flex-grow">
-                <span className="text-md font-semibold text-gray-700">{label}</span>
+                <span className={detailLabelClasses}>{label}</span>
                 <span
-                  className="text-sm text-gray-600 cursor-pointer hover:text-blue-600 transition"
+                  className={detailValueClasses}
                   onClick={() => handleEditClick(field as keyof Ambulance)}
                 >
                   {ambulance[field as keyof Ambulance]}
@@ -215,7 +325,7 @@ const RevisionDetails: React.FC<RevisionDetailsProps> = ({ ambulance, onClose })
             {editingField !== field && (
               <button
                 onClick={() => handleEditClick(field as keyof Ambulance)}
-                className="p-1 text-gray-400 hover:text-blue-500 transition"
+                className={editButtonClasses}
               >
                 <Edit2 size={18} />
               </button>
@@ -225,22 +335,22 @@ const RevisionDetails: React.FC<RevisionDetailsProps> = ({ ambulance, onClose })
       </div>
 
       {/* Péremption du matériel */}
-      <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
-        <h3 className="text-md font-semibold text-gray-800 flex items-center gap-2">
+      <div className={materielContainerClasses}>
+        <h3 className={materielTitleClasses}>
           Péremption du matériel
         </h3>
         <div className="mt-2 space-y-2">
           {materielObligatoire.map((item) => (
             <div
               key={item.id}
-              className="flex justify-between items-center bg-white p-3 rounded-lg border shadow-sm"
+              className={materielItemClasses}
             >
-              <span className="text-sm font-medium text-gray-700">
+              <span className={materielLabelClasses}>
                 {item.nom}
               </span>
               <input
                 type="date"
-                className="border rounded-lg p-2 text-sm"
+                className={materielInputClasses}
                 value={datesPeremption[item.id] || ""}
                 onChange={(e) => handleDateChange(item.id, e.target.value)}
               />

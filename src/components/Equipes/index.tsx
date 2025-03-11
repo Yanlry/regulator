@@ -5,13 +5,17 @@ import EquipeList from './EquipeList';
 import EquipeForm from './EquipeForm';
 import EquipeMap from './EquipeMap';
 import StatsDashboard from './StatsDashboard';
-import LoadingSpinner from '../../Common/LoadingSpinner';
+import LoadingSpinner from '../../common/LoadingSpinner';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface EquipesProps {
   isOpen: boolean;
 }
 
 const Equipes: React.FC<EquipesProps> = () => {
+  // Récupérer le thème du contexte
+  const { theme } = useTheme();
+  
   const [equipes, setEquipes] = useState<Equipe[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [currentEquipe, setCurrentEquipe] = useState<Equipe | null>(null);
@@ -96,32 +100,56 @@ const Equipes: React.FC<EquipesProps> = () => {
     return true;
   });
 
+  // Classes CSS adaptatives selon le thème
+  const containerClasses = `
+    transition-all duration-300 
+    ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-900'}
+    min-h-screen p-4
+  `;
+
+  const headerClasses = `text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`;
+  
+  const contentClasses = `
+    p-6 
+    ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}
+  `;
+
+  const cardClasses = `
+    p-4 rounded-lg shadow 
+    ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}
+  `;
+
+  const buttonPrimaryClasses = `
+    px-3 py-2 rounded text-white text-sm
+    ${theme === 'dark' ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600'}
+    transition-colors
+  `;
+
   return (
-    <div
-      className={`
-        transition-all duration-300 
-        bg-gray-100 min-h-screen p-4
-      `}
-    >
+    <div className={containerClasses}>
       {isLoading ? (
         <div className="relative w-full h-full min-h-screen">
           <LoadingSpinner />
         </div>
       ) : (
-        <div className="p-6">
+        <div className={contentClasses}>
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-800">Gestion des Équipes d'Ambulances</h1>
+            <h1 className={headerClasses}>Gestion des Équipes d'Ambulances</h1>
             <div className="flex space-x-3">
-              <div className="flex border rounded overflow-hidden">
+              <div className={`flex border rounded overflow-hidden ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>
                 <button 
                   onClick={() => setViewMode('liste')}
-                  className={`px-3 py-1 text-sm ${viewMode === 'liste' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+                  className={`px-3 py-1 text-sm ${viewMode === 'liste' 
+                    ? 'bg-blue-500 text-white' 
+                    : theme === 'dark' ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-700'}`}
                 >
                   Vue Liste
                 </button>
                 <button 
                   onClick={() => setViewMode('carte')}
-                  className={`px-3 py-1 text-sm ${viewMode === 'carte' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+                  className={`px-3 py-1 text-sm ${viewMode === 'carte' 
+                    ? 'bg-blue-500 text-white' 
+                    : theme === 'dark' ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-700'}`}
                 >
                   Vue Carte
                 </button>
@@ -129,48 +157,59 @@ const Equipes: React.FC<EquipesProps> = () => {
             </div>
             <button 
               onClick={handleAddEquipe}
-              className="flex items-center px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
+              className={buttonPrimaryClasses}
             >
-              <FaPlus className="mr-1" /> Nouvelle Équipe
+              <FaPlus className="mr-1 inline" /> Nouvelle Équipe
             </button>
           </div>
 
-          <div className="flex rounded overflow-hidden mb-4">
+          <div className={`flex rounded overflow-hidden mb-4 ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>
             <button 
               onClick={() => setFiltreStatus('tous')}
-              className={`px-3 py-1 text-sm ${filtreStatus === 'tous' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+              className={`px-3 py-1 text-sm ${filtreStatus === 'tous' 
+                ? 'bg-blue-500 text-white' 
+                : theme === 'dark' ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-700'}`}
             >
               Toutes
             </button>
             <button 
               onClick={() => setFiltreStatus('disponible')}
-              className={`px-3 py-1 text-sm ${filtreStatus === 'disponible' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+              className={`px-3 py-1 text-sm ${filtreStatus === 'disponible' 
+                ? 'bg-green-500 text-white' 
+                : theme === 'dark' ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-700'}`}
             >
               Disponibles
             </button>
             <button 
               onClick={() => setFiltreStatus('enMission')}
-              className={`px-3 py-1 text-sm ${filtreStatus === 'enMission' ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+              className={`px-3 py-1 text-sm ${filtreStatus === 'enMission' 
+                ? 'bg-orange-500 text-white' 
+                : theme === 'dark' ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-700'}`}
             >
               En mission
             </button>
           </div>
 
           {/* Statistiques */}
-          <StatsDashboard equipes={equipes} />
+          <div className={cardClasses + " mb-6"}>
+            <StatsDashboard equipes={equipes} theme={theme} />
+          </div>
           
           {/* Liste des équipes */}
-          {viewMode === 'liste' ? (
-            <EquipeList 
-              equipes={equipesFiltered} 
-              onEdit={handleEditEquipe}
-              onDelete={handleDeleteEquipe}
-              onToggleMission={toggleMissionStatus}
-              onToggleRepas={toggleRepasStatus}
-            />
-          ) : (
-            <EquipeMap equipes={equipesFiltered} />
-          )}
+          <div className={cardClasses}>
+            {viewMode === 'liste' ? (
+              <EquipeList 
+                equipes={equipesFiltered} 
+                onEdit={handleEditEquipe}
+                onDelete={handleDeleteEquipe}
+                onToggleMission={toggleMissionStatus}
+                onToggleRepas={toggleRepasStatus}
+                theme={theme}
+              />
+            ) : (
+              <EquipeMap equipes={equipesFiltered} theme={theme} />
+            )}
+          </div>
 
           {/* Modal pour ajouter/éditer une équipe */}
           {showModal && currentEquipe && (
@@ -182,6 +221,7 @@ const Equipes: React.FC<EquipesProps> = () => {
                 setCurrentEquipe(null);
               }}
               onSave={handleSaveEquipe}
+              theme={theme}
             />
           )}
         </div>

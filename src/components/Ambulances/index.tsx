@@ -19,9 +19,13 @@ import AmbulanceCard from "./AmbulanceCard";
 import RevisionDetails from "./RevisionDetails";
 import SearchAndFilters from "./SearchAndFilters";
 import StatsDashboard from "./StatsDashboard";
-import LoadingSpinner from "../../Common/LoadingSpinner";
+import LoadingSpinner from "../../common/LoadingSpinner";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const Ambulances: React.FC<AmbulancesProps> = ({ isOpen }) => {
+  // Get current theme from context
+  const { theme } = useTheme();
+  
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [maintenanceFilter, setMaintenanceFilter] = useState("all");
@@ -112,36 +116,101 @@ const Ambulances: React.FC<AmbulancesProps> = ({ isOpen }) => {
     setMaintenanceFilter("all");
   }, []);
 
+  // Theme-specific classes
+  const containerClasses = `
+    transition-all duration-300 
+    ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-900'}
+    min-h-screen 
+  `;
+
+  const headerClasses = `
+    shadow-md p-4 sticky top-0 z-10
+    ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}
+  `;
+
+  const titleClasses = `
+    text-xl font-bold flex items-center gap-2
+    ${theme === 'dark' ? 'text-white' : 'text-gray-800'}
+  `;
+
+  const subTextClasses = `
+    text-sm font-normal
+    ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}
+  `;
+
+  const statsToggleClasses = `
+    flex items-center gap-2 px-3 py-1 rounded-md 
+    transition-all duration-300
+    ${showStats 
+      ? theme === 'dark' 
+        ? 'bg-blue-800 text-blue-200 hover:bg-blue-700' 
+        : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+      : theme === 'dark'
+        ? 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+    }
+  `;
+
+  const refreshButtonClasses = `
+    flex items-center gap-1 px-3 py-1 rounded-md
+    ${theme === 'dark' 
+      ? 'bg-gray-600 text-gray-300 hover:bg-gray-500' 
+      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}
+  `;
+
+  const planButtonClasses = `
+    flex items-center gap-2 px-3 py-1 rounded-md
+    ${theme === 'dark' 
+      ? 'bg-blue-700 text-white hover:bg-blue-600' 
+      : 'bg-blue-600 text-white hover:bg-blue-700'}
+  `;
+
+  const addButtonClasses = `
+    flex items-center gap-2 px-3 py-1 rounded-md
+    ${theme === 'dark' 
+      ? 'bg-green-700 text-white hover:bg-green-600' 
+      : 'bg-green-600 text-white hover:bg-green-700'}
+  `;
+
+  const noResultsCardClasses = `
+    p-6 rounded-md shadow-md text-center
+    ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}
+  `;
+
+  const noResultsTitleClasses = `
+    text-md font-medium
+    ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}
+  `;
+
+  const noResultsTextClasses = `
+    text-sm mt-1
+    ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}
+  `;
+
+  const resetButtonClasses = `
+    mt-3 text-sm
+    ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}
+  `;
+
   return (
-    <div
-      className={`
-        transition-all duration-300 
-        bg-gray-100 min-h-screen 
-      `}
-    >
+    <div className={containerClasses}>
       {isLoading ? (
         <LoadingSpinner isOpen={isOpen} />
       ) : (
         <>
-          <header className="bg-white shadow-md p-4 sticky top-0 z-10">
+          <header className={headerClasses}>
             <div className="container mx-auto flex justify-between items-center">
               <div className="flex items-center gap-4">
-                <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <h1 className={titleClasses}>
                   <Wrench size={20} />
                   Maintenance des Ambulances
-                  <span className="text-sm font-normal text-gray-500">
+                  <span className={subTextClasses}>
                     ({stats.totalVehicles} véhicules)
                   </span>
                 </h1>
                 <button
                   onClick={() => setShowStats(!showStats)}
-                  className={`
-                    flex items-center gap-2 px-3 py-1 rounded-md 
-                    transition-all duration-300
-                    ${showStats 
-                      ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}
-                  `}
+                  className={statsToggleClasses}
                 >
                   {showStats ? <EyeOff size={16} /> : <Eye size={16} />}
                   <span className="text-sm">
@@ -153,21 +222,21 @@ const Ambulances: React.FC<AmbulancesProps> = ({ isOpen }) => {
               <div className="flex gap-2">
                 <button
                   onClick={handleRefresh}
-                  className="flex items-center gap-1 bg-gray-100 text-gray-700 px-3 py-1 rounded-md hover:bg-gray-200"
+                  className={refreshButtonClasses}
                 >
                   <RefreshCw size={14} />
                   <span className="hidden md:inline text-sm">Rafraîchir</span>
                 </button>
                 <button
                   onClick={handleScheduleMaintenance}
-                  className="flex items-center gap-2 bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700"
+                  className={planButtonClasses}
                 >
                   <Calendar size={16} />
                   <span className="text-sm">Planifier</span>
                 </button>
                 <button
                   onClick={handleAddVehicle}
-                  className="flex items-center gap-2 bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700"
+                  className={addButtonClasses}
                 >
                   <Plus size={16} />
                   <span className="text-sm">Ajouter</span>
@@ -177,7 +246,7 @@ const Ambulances: React.FC<AmbulancesProps> = ({ isOpen }) => {
           </header>
           
           <main className="container mx-auto p-4 space-y-6 max-w-7xl">
-            {showStats && <StatsDashboard stats={stats} />}
+            {showStats && <StatsDashboard stats={stats} theme={theme} />}
 
             <SearchAndFilters
               search={search}
@@ -186,12 +255,14 @@ const Ambulances: React.FC<AmbulancesProps> = ({ isOpen }) => {
               setFilter={setFilter}
               maintenanceFilter={maintenanceFilter}
               setMaintenanceFilter={setMaintenanceFilter}
+              theme={theme}
             />
 
             {selectedAmbulance ? (
               <RevisionDetails
                 ambulance={selectedAmbulance}
                 onClose={() => setSelectedAmbulance(null)}
+                theme={theme}
               />
             ) : filteredAmbulances.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -200,20 +271,21 @@ const Ambulances: React.FC<AmbulancesProps> = ({ isOpen }) => {
                     key={ambulance.id}
                     ambulance={ambulance}
                     onSelect={() => setSelectedAmbulance(ambulance)}
+                    theme={theme}
                   />
                 ))}
               </div>
             ) : (
-              <div className="bg-white p-6 rounded-md shadow-md text-center">
-                <Search size={32} className="mx-auto text-gray-400 mb-2" />
-                <h3 className="text-md font-medium text-gray-700">
+              <div className={noResultsCardClasses}>
+                <Search size={32} className={`mx-auto ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'} mb-2`} />
+                <h3 className={noResultsTitleClasses}>
                   Aucun véhicule trouvé
                 </h3>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className={noResultsTextClasses}>
                   Modifiez vos critères de recherche ou de filtrage
                 </p>
                 <button
-                  className="mt-3 text-blue-600 hover:text-blue-800 text-sm"
+                  className={resetButtonClasses}
                   onClick={handleResetFilters}
                 >
                   Réinitialiser les filtres

@@ -19,35 +19,36 @@ import { Ambulance } from '../../types';
 interface AmbulanceCardProps {
   ambulance: Ambulance;
   onSelect: () => void;
+  theme: string; 
 }
 
-const AmbulanceCard: React.FC<AmbulanceCardProps> = ({ ambulance, onSelect }) => {
+const AmbulanceCard: React.FC<AmbulanceCardProps> = ({ ambulance, onSelect, theme }) => {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [tempValue, setTempValue] = useState<string>("");
 
   const getMaintenanceInfo = (status: string) => {
     if (status === "À jour") {
       return {
-        color: "text-green-700",
-        bgColor: "bg-green-50",
+        color: theme === 'dark' ? "text-green-400" : "text-green-700",
+        bgColor: theme === 'dark' ? "bg-green-900" : "bg-green-50",
         icon: <CheckCircle size={14} className="mr-1" />,
       };
     } else if (status === "Entretien imminent") {
       return {
-        color: "text-orange-700",
-        bgColor: "bg-orange-50",
+        color: theme === 'dark' ? "text-orange-400" : "text-orange-700",
+        bgColor: theme === 'dark' ? "bg-orange-900" : "bg-orange-50",
         icon: <Clock size={14} className="mr-1" />,
       };
     } else if (status.includes("Réparation")) {
       return {
-        color: "text-red-700",
-        bgColor: "bg-red-50",
+        color: theme === 'dark' ? "text-red-400" : "text-red-700",
+        bgColor: theme === 'dark' ? "bg-red-900" : "bg-red-50",
         icon: <Wrench size={14} className="mr-1" />,
       };
     } else {
       return {
-        color: "text-amber-700",
-        bgColor: "bg-amber-50",
+        color: theme === 'dark' ? "text-amber-400" : "text-amber-700",
+        bgColor: theme === 'dark' ? "bg-amber-900" : "bg-amber-50",
         icon: <AlertTriangle size={14} className="mr-1" />,
       };
     }
@@ -101,10 +102,19 @@ const AmbulanceCard: React.FC<AmbulanceCardProps> = ({ ambulance, onSelect }) =>
     );
     const remainingKm = nextRevisionKm - ambulance.kilometrage;
     if (remainingKm <= 0)
-      return { label: `Dépassé de ${-remainingKm} km`, color: "text-red-700" };
+      return { 
+        label: `Dépassé de ${-remainingKm} km`, 
+        color: theme === 'dark' ? "text-red-400" : "text-red-700" 
+      };
     if (remainingKm <= 1000)
-      return { label: `${remainingKm} km restants`, color: "text-orange-700" };
-    return { label: `${remainingKm} km restants`, color: "text-green-700" };
+      return { 
+        label: `${remainingKm} km restants`, 
+        color: theme === 'dark' ? "text-orange-400" : "text-orange-700" 
+      };
+    return { 
+      label: `${remainingKm} km restants`, 
+      color: theme === 'dark' ? "text-green-400" : "text-green-700" 
+    };
   };
 
   const handleEditClick = (field: keyof Ambulance) => {
@@ -132,6 +142,84 @@ const AmbulanceCard: React.FC<AmbulanceCardProps> = ({ ambulance, onSelect }) =>
     setTempValue("");
   };
 
+  // Theme-specific classes
+  const cardClasses = `
+    rounded-md shadow-md p-4 border-l-4
+    ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}
+    ${ambulance.status === "En service"
+      ? "border-green-500"
+      : "border-red-500"
+    }
+  `;
+
+  const titleClasses = `
+    text-md font-semibold ml-2
+    ${theme === 'dark' ? 'text-white' : 'text-gray-800'}
+  `;
+
+  const inputClasses = `
+    text-sm border-b-2 border-gray-400 focus:border-blue-500 transition-all w-full outline-none py-1
+    ${theme === 'dark' ? 'text-white bg-gray-600' : 'text-gray-800 bg-white'}
+  `;
+
+  const editButtonClasses = `
+    ml-2 opacity-0 group-hover:opacity-100 transition-opacity 
+    ${theme === 'dark' ? 'text-gray-400 hover:text-blue-400' : 'text-gray-500 hover:text-blue-500'}
+  `;
+
+  const modelClasses = `
+    ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}
+  `;
+
+  const immatriculationClasses = `
+    font-medium
+    ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}
+  `;
+
+  const locationLabelClasses = `
+    font-medium
+    ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}
+  `;
+
+  const locationIconClasses = `
+    mr-2
+    ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}
+  `;
+
+  const locationTextClasses = `
+    ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}
+  `;
+
+  const infoBlockClasses = `
+    p-2 rounded
+    ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-100'}
+  `;
+
+  const infoLabelClasses = `
+    text-xs
+    ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}
+  `;
+
+  const infoValueClasses = `
+    font-medium
+    ${theme === 'dark' ? 'text-white' : 'text-gray-800'}
+  `;
+
+  const notesClasses = `
+    p-2 rounded mt-2
+    ${theme === 'dark' ? 'bg-amber-900' : 'bg-amber-50'}
+  `;
+
+  const notesTextClasses = `
+    text-xs flex items-center
+    ${theme === 'dark' ? 'text-amber-300' : 'text-amber-700'}
+  `;
+
+  const detailsButtonClasses = `
+    mt-2 px-3 py-1 rounded-md text-sm text-white
+    ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-500' : 'bg-blue-500 hover:bg-blue-600'}
+  `;
+
   const EditableField = ({ 
     field, 
     children 
@@ -147,17 +235,17 @@ const AmbulanceCard: React.FC<AmbulanceCardProps> = ({ ambulance, onSelect }) =>
             type="text"
             value={tempValue}
             onChange={(e) => setTempValue(e.target.value)}
-            className="text-sm text-gray-800 border-b-2 border-gray-400 focus:border-blue-500 transition-all w-full outline-none py-1"
+            className={inputClasses}
           />
           <button
             onClick={() => handleSave(field)}
-            className="p-1 text-green-500 hover:text-green-700 transition"
+            className="p-1 text-green-500 hover:text-green-400 transition"
           >
             <Check size={20} />
           </button>
           <button
             onClick={handleCancel}
-            className="p-1 text-red-500 hover:text-red-700 transition"
+            className="p-1 text-red-500 hover:text-red-400 transition"
           >
             <X size={20} />
           </button>
@@ -167,7 +255,7 @@ const AmbulanceCard: React.FC<AmbulanceCardProps> = ({ ambulance, onSelect }) =>
           {children}
           <button
             onClick={() => handleEditClick(field)}
-            className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity text-gray-500 hover:text-blue-500"
+            className={editButtonClasses}
           >
             <Edit2 size={14} />
           </button>
@@ -180,14 +268,16 @@ const AmbulanceCard: React.FC<AmbulanceCardProps> = ({ ambulance, onSelect }) =>
   const maintenanceUrgency = getMaintenanceUrgency(ambulance);
   const kilometrageInfo = getKilometrageInfo(ambulance);
 
+  const statusBadgeClasses = `
+    text-xs px-2 py-1 rounded-full
+    ${ambulance.status === "En service"
+      ? theme === 'dark' ? "bg-green-800 text-green-200" : "bg-green-100 text-green-700"
+      : theme === 'dark' ? "bg-red-800 text-red-200" : "bg-red-100 text-red-700"
+    }
+  `;
+
   return (
-    <div
-      className={`bg-white rounded-md shadow-md p-4 border-l-4 ${
-        ambulance.status === "En service"
-          ? "border-green-500"
-          : "border-red-500"
-      }`}
-    >
+    <div className={cardClasses}>
       <div className="flex justify-between items-center mb-3">
         <div className="flex items-center gap-2">
           <EditableField field="id" value={ambulance.id}>
@@ -210,17 +300,11 @@ const AmbulanceCard: React.FC<AmbulanceCardProps> = ({ ambulance, onSelect }) =>
                 }
               />
             )}
-            <h3 className="text-md font-semibold text-gray-800 ml-2">
+            <h3 className={titleClasses}>
               {ambulance.id}
             </h3>
           </EditableField>
-          <span
-            className={`text-xs px-2 py-1 rounded-full ${
-              ambulance.status === "En service"
-                ? "bg-green-100 text-green-700"
-                : "bg-red-100 text-red-700"
-            }`}
-          >
+          <span className={statusBadgeClasses}>
             {ambulance.status}
           </span>
         </div>
@@ -228,18 +312,18 @@ const AmbulanceCard: React.FC<AmbulanceCardProps> = ({ ambulance, onSelect }) =>
       <div className="space-y-2 text-sm">
         <div className="flex justify-between">
           <EditableField field="modele" value={ambulance.modele}>
-            <span className="text-gray-600">{ambulance.modele}</span>
+            <span className={modelClasses}>{ambulance.modele}</span>
           </EditableField>
           <EditableField field="immatriculation" value={ambulance.immatriculation}>
-            <span className="font-medium text-gray-800">
+            <span className={immatriculationClasses}>
               {ambulance.immatriculation}
             </span>
           </EditableField>
         </div>
         <EditableField field="localisation" value={ambulance.localisation}>
-          <p className="flex items-center text-gray-700">
-            <MapPin size={14} className="mr-2 text-gray-500" />
-            <span className="font-medium">Localisation :</span>{" "}
+          <p className={`flex items-center ${locationTextClasses}`}>
+            <MapPin size={14} className={locationIconClasses} />
+            <span className={locationLabelClasses}>Localisation :</span>{" "}
             {ambulance.localisation}
           </p>
         </EditableField>
@@ -251,19 +335,19 @@ const AmbulanceCard: React.FC<AmbulanceCardProps> = ({ ambulance, onSelect }) =>
           </p>
         </EditableField>
         <div className="grid grid-cols-2 gap-2">
-          <div className="bg-gray-100 p-2 rounded">
-            <p className="text-xs text-gray-500">Dernier entretien</p>
+          <div className={infoBlockClasses}>
+            <p className={infoLabelClasses}>Dernier entretien</p>
             <EditableField field="dateDernierEntretien" value={ambulance.dateDernierEntretien}>
-              <p className="font-medium flex items-center">
+              <p className={`${infoValueClasses} flex items-center`}>
                 <Calendar size={12} className="mr-1 text-blue-500" />
                 {ambulance.dateDernierEntretien}
               </p>
             </EditableField>
           </div>
-          <div className="bg-gray-100 p-2 rounded">
-            <p className="text-xs text-gray-500">Prochain entretien</p>
+          <div className={infoBlockClasses}>
+            <p className={infoLabelClasses}>Prochain entretien</p>
             <EditableField field="prochainEntretien" value={ambulance.prochainEntretien}>
-              <p className="font-medium flex items-center">
+              <p className={`${infoValueClasses} flex items-center`}>
                 <Calendar size={12} className="mr-1 text-purple-500" />
                 {ambulance.prochainEntretien}
               </p>
@@ -271,18 +355,18 @@ const AmbulanceCard: React.FC<AmbulanceCardProps> = ({ ambulance, onSelect }) =>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-2">
-          <div className="bg-gray-100 p-2 rounded">
-            <p className="text-xs text-gray-500">Kilométrage</p>
+          <div className={infoBlockClasses}>
+            <p className={infoLabelClasses}>Kilométrage</p>
             <EditableField field="kilometrage" value={ambulance.kilometrage.toString()}>
-              <p className="font-medium">
+              <p className={infoValueClasses}>
                 {ambulance.kilometrage.toLocaleString()} km
               </p>
             </EditableField>
           </div>
-          <div className="bg-gray-100 p-2 rounded">
-            <p className="text-xs text-gray-500">Prochaine révision</p>
+          <div className={infoBlockClasses}>
+            <p className={infoLabelClasses}>Prochaine révision</p>
             <EditableField field="prochaineRevision" value={ambulance.prochaineRevision}>
-              <p className={`font-medium ${kilometrageInfo.color}`}>
+              <p className={`${infoValueClasses} ${kilometrageInfo.color}`}>
                 {kilometrageInfo.label}
               </p>
             </EditableField>
@@ -290,8 +374,8 @@ const AmbulanceCard: React.FC<AmbulanceCardProps> = ({ ambulance, onSelect }) =>
         </div>
         {ambulance.notes && (
           <EditableField field="notes" value={ambulance.notes}>
-            <div className="bg-amber-50 p-2 rounded mt-2">
-              <p className="text-xs text-amber-700 flex items-center">
+            <div className={notesClasses}>
+              <p className={notesTextClasses}>
                 <FileText size={12} className="mr-1" />
                 Notes: {ambulance.notes}
               </p>
@@ -331,7 +415,7 @@ const AmbulanceCard: React.FC<AmbulanceCardProps> = ({ ambulance, onSelect }) =>
       </div>
       <button
         onClick={onSelect}
-        className="mt-2 px-3 py-1 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600"
+        className={detailsButtonClasses}
       >
         Détails
       </button>

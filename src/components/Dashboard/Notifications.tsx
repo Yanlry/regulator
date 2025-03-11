@@ -104,34 +104,96 @@ interface Notification {
   textColor: string;
 }
 
-const NotificationItem = ({ notification }: { notification: Notification }) => {
+// Add props interface for Notifications
+interface NotificationsProps {
+  theme: string;
+}
+
+// Update NotificationItem to accept theme
+interface NotificationItemProps {
+  notification: Notification;
+  theme: string;
+}
+
+const NotificationItem: React.FC<NotificationItemProps> = ({ notification, theme }) => {
   const [expanded, setExpanded] = useState(false);
   
+  // Get theme-specific background color
+  const getThemedBgColor = () => {
+    if (theme === 'dark') {
+      // Map light background colors to dark theme equivalents
+      switch(notification.bgColor) {
+        case 'bg-red-50': return 'bg-red-900';
+        case 'bg-yellow-50': return 'bg-yellow-900';
+        case 'bg-blue-50': return 'bg-blue-900';
+        case 'bg-green-50': return 'bg-green-900';
+        case 'bg-orange-50': return 'bg-orange-900';
+        default: return 'bg-gray-800';
+      }
+    }
+    return notification.bgColor;
+  };
+
+  // Get theme-specific border color
+  const getThemedBorderColor = () => {
+    if (theme === 'dark') {
+      // Map light border colors to dark theme equivalents
+      switch(notification.borderColor) {
+        case 'border-red-100': return 'border-red-700';
+        case 'border-yellow-100': return 'border-yellow-700';
+        case 'border-blue-100': return 'border-blue-700';
+        case 'border-green-100': return 'border-green-700';
+        case 'border-orange-100': return 'border-orange-700';
+        default: return 'border-gray-700';
+      }
+    }
+    return notification.borderColor;
+  };
+
+  // Get theme-specific text color
+  const getThemedTextColor = () => {
+    if (theme === 'dark') {
+      // Map light text colors to dark theme equivalents
+      switch(notification.textColor) {
+        case 'text-red-700': return 'text-red-300';
+        case 'text-yellow-700': return 'text-yellow-300';
+        case 'text-blue-700': return 'text-blue-300';
+        case 'text-green-700': return 'text-green-300';
+        case 'text-orange-700': return 'text-orange-300';
+        default: return 'text-gray-300';
+      }
+    }
+    return notification.textColor;
+  };
+
+  const iconBgColor = theme === 'dark' ? 'bg-gray-700' : 'bg-white';
+  const timeTextColor = theme === 'dark' ? 'text-gray-400' : 'text-gray-500';
+
   return (
     <div 
       key={notification.id} 
-      className={`flex items-start p-2 rounded-lg ${notification.bgColor} border border-t-0 border-r-0 border-b-0 border-l-4 ${notification.borderColor} transition-all hover:shadow-sm`}
+      className={`flex items-start p-2 rounded-lg ${getThemedBgColor()} border border-t-0 border-r-0 border-b-0 border-l-4 ${getThemedBorderColor()} transition-all hover:shadow-sm`}
     >
-      <div className={`flex-shrink-0 p-1.5 rounded-full bg-white`}>
+      <div className={`flex-shrink-0 p-1.5 rounded-full ${iconBgColor}`}>
         {notification.icon}
       </div>
       <div className="ml-2 flex-grow min-w-0">
         <div className="flex justify-between items-start">
-          <h3 className={`text-xs font-bold ${notification.textColor} leading-tight`}>
+          <h3 className={`text-xs font-bold ${getThemedTextColor()} leading-tight`}>
             {notification.title}
           </h3>
-          <span className="text-xs text-gray-500 ml-2 whitespace-nowrap">
+          <span className={`text-xs ${timeTextColor} ml-2 whitespace-nowrap`}>
             {notification.time}
           </span>
         </div>
         <div className="relative">
-          <p className={`text-xs mt-1 ${notification.textColor} ${expanded ? '' : 'line-clamp-2'} leading-snug`}>
+          <p className={`text-xs mt-1 ${getThemedTextColor()} ${expanded ? '' : 'line-clamp-2'} leading-snug`}>
             {notification.message}
           </p>
           {notification.message.length > 50 && (
             <button 
               onClick={() => setExpanded(!expanded)}
-              className={`text-xs ml-1 ${notification.textColor} font-medium hover:underline focus:outline-none inline-flex items-center`}
+              className={`text-xs ml-1 ${getThemedTextColor()} font-medium hover:underline focus:outline-none inline-flex items-center`}
             >
               {expanded ? (
                 <>
@@ -152,7 +214,7 @@ const NotificationItem = ({ notification }: { notification: Notification }) => {
   );
 };
 
-const Notifications = () => {
+const Notifications: React.FC<NotificationsProps> = ({ theme }) => {
   const [filter, setFilter] = useState("Tous");
   const filterOptions = ["Tous", "Urgence", "Retard", "Planification", "Terminé", "Retour"];
   
@@ -160,20 +222,43 @@ const Notifications = () => {
     ? notifications 
     : notifications.filter(n => n.type === filter);
 
+  // Theme-specific classes
+  const containerClasses = `
+    lg:col-span-3 rounded-xl p-2 overflow-hidden flex flex-col
+    ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}
+  `;
+
+  const selectClasses = `
+    text-xs py-1 px-2 rounded focus:outline-none focus:ring-1 focus:ring-blue-500
+    ${theme === 'dark' 
+      ? 'bg-gray-600 border-gray-500 text-gray-200' 
+      : 'bg-gray-50 border-gray-200 text-gray-700'}
+  `;
+
+  const markAllClasses = `
+    text-xs font-medium
+    ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}
+  `;
+
+  const emptyMessageClasses = `
+    flex items-center justify-center p-4 text-sm
+    ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}
+  `;
+
   return (
-    <div className="lg:col-span-3 bg-white rounded-xl p-2 overflow-hidden flex flex-col" style={{ maxHeight: "750px", height: "100%" }}>
+    <div className={containerClasses} style={{ maxHeight: "750px", height: "100%" }}>
       <div className="flex justify-between items-center mb-2 flex-shrink-0">
         <div className="flex items-center space-x-2">
           <select 
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="text-xs py-1 px-2 bg-gray-50 border border-gray-200 rounded text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className={selectClasses}
           >
             {filterOptions.map(option => (
               <option key={option} value={option}>{option}</option>
             ))}
           </select>
-          <button className="text-xs text-blue-600 hover:text-blue-800 font-medium">
+          <button className={markAllClasses}>
             Tout marquer
           </button>
         </div>
@@ -183,10 +268,10 @@ const Notifications = () => {
         <div className="space-y-2">
           {filteredNotifications.length > 0 ? (
             filteredNotifications.map((notif) => (
-              <NotificationItem key={notif.id} notification={notif} />
+              <NotificationItem key={notif.id} notification={notif} theme={theme} />
             ))
           ) : (
-            <div className="flex items-center justify-center p-4 text-gray-500 text-sm">
+            <div className={emptyMessageClasses}>
               Aucune notification de ce type
             </div>
           )}

@@ -11,6 +11,7 @@ import {
 
 interface TransportVolumeChartProps {
   selectedPeriod: string;
+  theme: string;
 }
 
 const TransportVolumeChart: React.FC<TransportVolumeChartProps> = ({

@@ -28,9 +28,10 @@ interface AmbulanceActivity {
 interface AmbulanceTrackingProps {
   stats: Stat[];
   activities: AmbulanceActivity[];
+  theme: string;
 }
 
-const AmbulanceTracking: React.FC<AmbulanceTrackingProps> = ({ stats }) => {
+const AmbulanceTracking: React.FC<AmbulanceTrackingProps> = ({ stats, theme }) => {
   const ambulances = [
     {
       id: "AMB-101",
@@ -183,50 +184,133 @@ const AmbulanceTracking: React.FC<AmbulanceTrackingProps> = ({ stats }) => {
   };
 
   const getStatusStyles = (status: string) => {
-    switch (status) {
-      case "Libre":
-        return {
-          bgColor: "bg-green-100",
-          textColor: "text-green-800",
-          dotColor: "bg-green-500",
-        };
-      case "Occupé":
-        return {
-          bgColor: "bg-red-100",
-          textColor: "text-red-800",
-          dotColor: "bg-red-500",
-        };
-      case "Pause":
-        return {
-          bgColor: "bg-yellow-100",
-          textColor: "text-yellow-800",
-          dotColor: "bg-yellow-500",
-        };
-      default:
-        return {
-          bgColor: "bg-gray-100",
-          textColor: "text-gray-800",
-          dotColor: "bg-gray-500",
-        };
+    if (theme === 'dark') {
+      switch (status) {
+        case "Libre":
+          return {
+            bgColor: "bg-green-900",
+            textColor: "text-green-200",
+            dotColor: "bg-green-400",
+          };
+        case "Occupé":
+          return {
+            bgColor: "bg-red-900",
+            textColor: "text-red-200",
+            dotColor: "bg-red-400",
+          };
+        case "Pause":
+          return {
+            bgColor: "bg-yellow-900",
+            textColor: "text-yellow-200",
+            dotColor: "bg-yellow-400",
+          };
+        default:
+          return {
+            bgColor: "bg-gray-800",
+            textColor: "text-gray-200",
+            dotColor: "bg-gray-400",
+          };
+      }
+    } else {
+      switch (status) {
+        case "Libre":
+          return {
+            bgColor: "bg-green-100",
+            textColor: "text-green-800",
+            dotColor: "bg-green-500",
+          };
+        case "Occupé":
+          return {
+            bgColor: "bg-red-100",
+            textColor: "text-red-800",
+            dotColor: "bg-red-500",
+          };
+        case "Pause":
+          return {
+            bgColor: "bg-yellow-100",
+            textColor: "text-yellow-800",
+            dotColor: "bg-yellow-500",
+          };
+        default:
+          return {
+            bgColor: "bg-gray-100",
+            textColor: "text-gray-800",
+            dotColor: "bg-gray-500",
+          };
+      }
     }
   };
 
+  // Theme-specific classes
+  const containerClasses = `
+    lg:col-span-2 rounded-xl shadow-md p-2 w-full overflow-hidden flex flex-col
+    ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}
+  `;
+
+  const mapContainerClasses = `
+    h-72 w-full rounded-lg overflow-hidden flex-shrink-0
+    ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}
+  `;
+
+  const statsContainerClasses = `
+    mt-2 mb-2 flex justify-around p-2 rounded-lg flex-shrink-0
+    ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}
+  `;
+
+  const statTextClasses = `
+    text-xs font-medium
+    ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}
+  `;
+
+  const navButtonClasses = `
+    absolute top-1/2 -translate-y-1/2 p-1.5 rounded-full shadow-md z-20 transition-colors border
+    ${theme === 'dark' 
+      ? 'bg-gray-700 hover:bg-gray-600 border-gray-600 text-gray-300' 
+      : 'bg-white hover:bg-gray-100 border-gray-200 text-gray-500'}
+  `;
+
+  const rowClasses = (index: number) => `
+    mb-2 p-2 rounded-lg border transition-all hover:shadow-sm
+    ${theme === 'dark'
+      ? index % 2 === 0 ? 'bg-gray-750 border-gray-700' : 'bg-gray-800 border-gray-700'
+      : index % 2 === 0 ? 'bg-gray-50 border-gray-100' : 'bg-white border-gray-100'}
+  `;
+
+  const ambulanceIdClasses = `
+    font-bold text-xs px-3 py-1 rounded-md
+    ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-900'}
+  `;
+
+  const labelClasses = `
+    text-xs font-medium
+    ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}
+  `;
+
+  const valueClasses = `
+    text-xs
+    ${theme === 'dark' ? 'text-gray-200' : 'text-gray-900'}
+  `;
+
+  const arrowIconClasses = `
+    ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}
+  `;
+
   return (
     <div
-      className="lg:col-span-2 bg-white rounded-xl shadow-md p-2 w-full overflow-hidden flex flex-col"
+      className={containerClasses}
       style={{ maxHeight: "750px", height: "100%" }}
     >
       {/* Map - taille fixe */}
-      <div className="h-72 w-full bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-        <AmbulanceMap />
+      <div className={mapContainerClasses}>
+        <AmbulanceMap theme="light" />
       </div>
 
       {/* Statistics - taille fixe */}
-      <div className="mt-2 mb-2 flex justify-around bg-gray-50 p-2 rounded-lg flex-shrink-0">
+      <div className={statsContainerClasses}>
         {stats.map((stat, index) => (
           <div key={index} className="flex items-center">
             <span className={`h-3 w-3 rounded-full ${stat.color} mr-2`}></span>
-            <span className="text-xs font-medium text-gray-700">
+            <span className={statTextClasses}>
               {stat.label}: <span className="font-bold">{stat.count}</span>
             </span>
           </div>
@@ -241,16 +325,20 @@ const AmbulanceTracking: React.FC<AmbulanceTrackingProps> = ({ stats }) => {
         {/* Wrapper pour les boutons et le contenu */}
         <div className="relative flex-grow overflow-hidden">
           <button
-            className="absolute left-0 top-1/2 -translate-y-1/2 bg-white p-1.5 rounded-full shadow-md z-20 hover:bg-gray-100 transition-colors border border-gray-200"
+            className={`${navButtonClasses} left-0`}
             onClick={() => scroll("left")}
           >
-            <FaChevronLeft className="text-gray-500" />
+            <FaChevronLeft />
           </button>
 
           <div className="h-full overflow-y-auto">
             <div
               ref={scrollRef}
-              className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 mx-8 min-h-full"
+              className={`overflow-x-auto mx-8 min-h-full ${
+                theme === 'dark' 
+                  ? 'scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800' 
+                  : 'scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100'
+              }`}
             >
               <div className="min-w-[1200px] pb-4">
                 {ambulances.map((ambulance, index) => {
@@ -260,17 +348,13 @@ const AmbulanceTracking: React.FC<AmbulanceTrackingProps> = ({ stats }) => {
                   return (
                     <div
                       key={index}
-                      className={`mb-2 p-2 rounded-lg ${
-                        index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                      } border border-gray-100 transition-all hover:shadow-sm`}
+                      className={rowClasses(index)}
                     >
                       <div className="grid grid-cols-12 gap-4 items-center">
                         {/* Vehicle ID & Status */}
                         <div className="col-span-2">
                           <div className="flex items-center space-x-3">
-                            <div
-                              className={`font-bold text-gray-900 text-xs px-3 py-1 rounded-md bg-gray-100`}
-                            >
+                            <div className={ambulanceIdClasses}>
                               {ambulance.id}
                             </div>
                             <div
@@ -289,11 +373,11 @@ const AmbulanceTracking: React.FC<AmbulanceTrackingProps> = ({ stats }) => {
                           <div className="flex items-start">
                             <FaMapMarkerAlt className="text-blue-500 mt-0.5 mr-2 flex-shrink-0" />
                             <div>
-                              <div className="text-xs text-gray-500 font-medium">
+                              <div className={labelClasses}>
                                 Origine
                               </div>
                               <div
-                                className="text-xs text-gray-900 truncate"
+                                className={`${valueClasses} truncate`}
                                 title={ambulance.location}
                               >
                                 {ambulance.location}
@@ -304,7 +388,7 @@ const AmbulanceTracking: React.FC<AmbulanceTrackingProps> = ({ stats }) => {
 
                         {/* Arrow */}
                         <div className="col-span-1 flex justify-center">
-                          <FaArrowRight className="text-gray-400" />
+                          <FaArrowRight className={arrowIconClasses} />
                         </div>
 
                         {/* Destination */}
@@ -312,11 +396,11 @@ const AmbulanceTracking: React.FC<AmbulanceTrackingProps> = ({ stats }) => {
                           <div className="flex items-start">
                             <FaMapMarkerAlt className="text-red-500 mt-0.5 mr-2 flex-shrink-0" />
                             <div>
-                              <div className="text-xs text-gray-500 font-medium">
+                              <div className={labelClasses}>
                                 Destination
                               </div>
                               <div
-                                className="text-xs text-gray-900 truncate"
+                                className={`${valueClasses} truncate`}
                                 title={ambulance.destination}
                               >
                                 {ambulance.destination}
@@ -329,23 +413,23 @@ const AmbulanceTracking: React.FC<AmbulanceTrackingProps> = ({ stats }) => {
                         <div className="col-span-3">
                           <div className="grid grid-cols-2 gap-2">
                             <div className="flex items-start justify-start">
-                              <FaCalendarAlt className="text-gray-400 mt-0.5 mr-2 flex-shrink-0" />
+                              <FaCalendarAlt className={arrowIconClasses + " mt-0.5 mr-2 flex-shrink-0"} />
                               <div>
-                                <div className="text-xs text-gray-500 font-medium">
+                                <div className={labelClasses}>
                                   Départ
                                 </div>
-                                <div className="text-xs text-gray-900">
+                                <div className={valueClasses}>
                                   {ambulance.heureDepart}
                                 </div>
                               </div>
                             </div>
                             <div className="flex items-start justify-end pr-4">
-                              <FaClock className="text-gray-400 mt-0.5 mr-2 flex-shrink-0" />
+                              <FaClock className={arrowIconClasses + " mt-0.5 mr-2 flex-shrink-0"} />
                               <div>
-                                <div className="text-xs text-gray-500 font-medium">
+                                <div className={labelClasses}>
                                   Arrivée
                                 </div>
-                                <div className="text-xs text-gray-900">
+                                <div className={valueClasses}>
                                   {ambulance.heureArrivee}
                                 </div>
                               </div>
@@ -361,10 +445,10 @@ const AmbulanceTracking: React.FC<AmbulanceTrackingProps> = ({ stats }) => {
           </div>
 
           <button
-            className="absolute right-0 top-1/2 -translate-y-1/2 bg-white p-1.5 rounded-full shadow-md z-20 hover:bg-gray-100 transition-colors border border-gray-200"
+            className={`${navButtonClasses} right-0`}
             onClick={() => scroll("right")}
           >
-            <FaChevronRight className="text-gray-500" />
+            <FaChevronRight />
           </button>
         </div>
       </div>

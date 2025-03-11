@@ -1,3 +1,5 @@
+import React from 'react';
+
 const interventionData = [
   {
     label: "Patients transportés",
@@ -50,13 +52,47 @@ const interventionData = [
   },
 ];
 
-const InterventionSummary = () => {
-  return (
-    <div className="bg-white rounded-xl shadow-md p-2">
+interface InterventionSummaryProps {
+  theme: string; 
+}
 
+const InterventionSummary: React.FC<InterventionSummaryProps> = ({ theme }) => {
+  // Theme-specific class definitions
+  const containerClasses = `
+    rounded-xl shadow-md p-2
+    ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}
+  `;
+
+  const selectClasses = `
+    text-sm border rounded-md px-2 py-1
+    ${theme === 'dark' ? 'bg-gray-700 text-gray-200 border-gray-600' : 'bg-white text-gray-900 border-gray-300'}
+  `;
+
+  const labelClasses = `
+    text-sm font-medium
+    ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}
+  `;
+
+  const valueClasses = `
+    text-2xl font-bold
+    ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}
+  `;
+
+  const progressBackgroundClasses = `
+    w-full rounded-full h-2
+    ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}
+  `;
+
+  const commentClasses = `
+    text-xs
+    ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}
+  `;
+
+  return (
+    <div className={containerClasses}>
       {/* 📌 En-tête */}
       <div className="flex justify-between items-center mb-4">
-        <select className="text-sm border rounded-md px-2 py-1">
+        <select className={selectClasses}>
           <option>Aujourd'hui</option>
           <option>Cette semaine</option>
           <option>Ce mois</option>
@@ -69,18 +105,18 @@ const InterventionSummary = () => {
           <div key={index}>
             {/* Titre & Valeur */}
             <div className="flex justify-between items-center mb-2">
-              <h3 className="text-sm font-medium text-gray-500">{item.label}</h3>
-              <span className="text-2xl font-bold">{item.value}</span>
+              <h3 className={labelClasses}>{item.label}</h3>
+              <span className={valueClasses}>{item.value}</span>
             </div>
             {/* Barre de progression */}
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className={progressBackgroundClasses}>
               <div
                 className={`${item.barColor} h-2 rounded-full`}
                 style={{ width: `${item.percentage}%` }}
               ></div>
             </div>
             {/* Commentaire */}
-            <p className="text-xs text-gray-500 mt-1">{item.comment}</p>
+            <p className={commentClasses}>{item.comment}</p>
           </div>
         ))}
       </div>

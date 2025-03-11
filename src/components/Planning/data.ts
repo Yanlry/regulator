@@ -2,6 +2,7 @@ import { Employee, EmployeePlanning, StatusOption, LegendItem } from './types';
 
 export const employees: Employee[] = [
   {
+    id: "1",
     name: "Alice Martin",
     role: "Secrétaire",
     hoursWorked: 22,
@@ -11,6 +12,7 @@ export const employees: Employee[] = [
     restDay: "Dimanche 3 Mars 2025",
   },
   {
+    id: "2",
     name: "Emma Dubois",
     role: "Secrétaire",
     hoursWorked: 138,
@@ -22,6 +24,7 @@ export const employees: Employee[] = [
   ...Array(6)
     .fill(null)
     .map((_, i) => ({
+      id: `aux-${i + 1}`,
       name: `Auxiliaire ${i + 1}`,
       role: "Auxiliaire Ambulancier",
       hoursWorked: 144,
@@ -33,6 +36,7 @@ export const employees: Employee[] = [
   ...Array(7)
     .fill(null)
     .map((_, i) => ({
+      id: `amb-${i + 1}`,
       name: `Ambulancier ${i + 1}`,
       role: "Ambulancier",
       hoursWorked: 144,

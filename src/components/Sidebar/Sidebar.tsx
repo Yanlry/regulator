@@ -1,4 +1,4 @@
-import React, { useState, useContext, createContext, useCallback, useEffect, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Home,
   Calendar,
@@ -16,47 +16,11 @@ import {
   Settings,
   Shield,
   Command,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
-
-/**
- * Interface pour l'état de la sidebar et fonctions de contrôle
- */
-interface SidebarContextType {
-  /** État d'ouverture de la sidebar */
-  isOpen: boolean;
-  /** Fonction pour ouvrir la sidebar manuellement */
-  openSidebar: () => void;
-  /** Fonction pour fermer la sidebar manuellement */
-  closeSidebar: () => void;
-  /** Fonction pour basculer l'état de la sidebar */
-  toggleSidebar: () => void;
-}
-
-/**
- * Contexte pour partager l'état de la sidebar dans l'application
- */
-const SidebarContext = createContext<SidebarContextType | null>(null);
-
-/**
- * Hook personnalisé pour accéder à l'état de la sidebar
- * @returns État et contrôles de la sidebar
- */
-export const useSidebar = (): SidebarContextType => {
-  const context = useContext(SidebarContext);
-  if (!context) {
-    throw new Error("useSidebar doit être utilisé dans un SidebarProvider");
-  }
-  return context;
-};
-
-/**
- * Props du composant SidebarProvider
- */
-interface SidebarProviderProps {
-  /** Composants enfants */
-  children: React.ReactNode;
-}
+import { useTheme } from "../../contexts/ThemeContext";
 
 /**
  * Structure de navigation de l'application
@@ -100,43 +64,53 @@ const navigationSections = [
 ];
 
 /**
- * Fournisseur de contexte pour la sidebar
- * @param props Props du composant
+ * Interface pour les props du composant StandaloneSidebar
  */
-export const SidebarProvider: React.FC<SidebarProviderProps> = ({ children }) => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  
-  const openSidebar = useCallback(() => setIsOpen(true), []);
-  const closeSidebar = useCallback(() => setIsOpen(false), []);
-  const toggleSidebar = useCallback(() => setIsOpen(prev => !prev), []);
-  
-  const contextValue = {
-    isOpen,
-    openSidebar,
-    closeSidebar,
-    toggleSidebar
-  };
-  
-  return (
-    <SidebarContext.Provider value={contextValue}>
-      {children}
-    </SidebarContext.Provider>
-  );
-};
+interface StandaloneSidebarProps {
+  /** Callback appelé quand l'état d'ouverture change */
+  onOpenChange?: (isOpen: boolean) => void;
+  /** État initial d'ouverture */
+  initialOpen?: boolean;
+}
 
 /**
- * Composant Sidebar avec ouverture au survol
+ * Sidebar autonome qui gère son propre état et notifie le parent des changements
  */
-const Sidebar: React.FC = () => {
-  const { isOpen, openSidebar, closeSidebar, toggleSidebar } = useSidebar();
+const StandaloneSidebar: React.FC<StandaloneSidebarProps> = ({
+  onOpenChange,
+  initialOpen = false,
+}) => {
+  // Utiliser le hook de thème
+  const { theme, toggleTheme } = useTheme();
   
+  // État local pour l'ouverture de la sidebar
+  const [isOpen, setIsOpen] = useState<boolean>(initialOpen);
+  
+  // États pour les paramètres
   const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
-  const [hoverMode, setHoverMode] = useState<boolean>(true);
+  const [hoverMode, setHoverMode] = useState<boolean>(() => {
+    const savedHoverMode = localStorage.getItem('hoverMode');
+    return savedHoverMode ? JSON.parse(savedHoverMode) : true;
+  });
   
+  // Refs pour les interactions
   const settingsRef = useRef<HTMLDivElement>(null);
-  // Utilisé number au lieu de NodeJS.Timeout pour éviter l'erreur d'espace de noms
   const timeoutRef = useRef<number | null>(null);
 
+  // Notifier le parent quand l'état d'ouverture change
+  useEffect(() => {
+    onOpenChange?.(isOpen);
+  }, [isOpen, onOpenChange]);
+
+  // Persister le mode survol dans localStorage
+  useEffect(() => {
+    localStorage.setItem('hoverMode', JSON.stringify(hoverMode));
+  }, [hoverMode]);
+  
+  // Fonctions pour gérer l'état d'ouverture
+  const openSidebar = () => setIsOpen(true);
+  const closeSidebar = () => setIsOpen(false);
+  const toggleSidebar = () => setIsOpen(prev => !prev);
   
   // Gestion du survol
   const handleMouseEnter = () => {
@@ -187,8 +161,12 @@ const Sidebar: React.FC = () => {
   return (
     <div
       className={`
-        bg-gradient-to-b from-gray-900 to-gray-800 
-        text-white shadow-2xl 
+        ${
+          theme === 'dark'
+            ? 'bg-gradient-to-b from-gray-900 to-gray-800 text-white'
+            : 'bg-gradient-to-b from-blue-50 to-gray-100 text-gray-800'
+        }
+        shadow-2xl 
         transition-all duration-300 
         fixed left-0 top-0 h-screen 
         flex flex-col 
@@ -202,7 +180,14 @@ const Sidebar: React.FC = () => {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <button
-              className="p-2 bg-gray-800 hover:bg-gray-700 rounded-md transition-all"
+              className={`
+                p-2 rounded-md transition-all
+                ${
+                  theme === 'dark'
+                    ? 'bg-gray-800 hover:bg-gray-700'
+                    : 'bg-gray-200 hover:bg-gray-300'
+                }
+              `}
               onClick={toggleSidebar}
               title={isOpen ? "Fermer le menu" : "Ouvrir le menu"}
             >
@@ -211,7 +196,9 @@ const Sidebar: React.FC = () => {
             {isOpen && (
               <div className="flex items-center gap-2">
                 <Shield size={22} className="text-blue-500" />
-                <h1 className="text-xl font-bold text-white">RÉGULATOR</h1>
+                <h1 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
+                  RÉGULATOR
+                </h1>
               </div>
             )}
           </div>
@@ -219,30 +206,101 @@ const Sidebar: React.FC = () => {
           {isOpen && (
             <div className="relative ml-1" ref={settingsRef}>
               <button
-                className="p-2 hover:bg-gray-700 rounded-md transition-all"
+                className={`
+                  p-2 rounded-md transition-all
+                  ${
+                    theme === 'dark'
+                      ? 'hover:bg-gray-700'
+                      : 'hover:bg-gray-300'
+                  }
+                `}
                 onClick={() => setSettingsOpen(!settingsOpen)}
                 title="Paramètres de la barre latérale"
               >
                 <Settings
                   size={20}
-                  className="text-gray-300 hover:text-white"
+                  className={
+                    theme === 'dark'
+                      ? 'text-gray-300 hover:text-white'
+                      : 'text-gray-600 hover:text-gray-800'
+                  }
                 />
               </button>
 
+              {/* Menu des paramètres */}
               {settingsOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-gray-800 rounded-md shadow-lg z-50 text-sm">
-                  <div className="p-3 border-b border-gray-700">
-                    <h3 className="font-semibold">
-                      Options de la barre latérale
-                    </h3>
+                <div
+                  className={`
+                    absolute right-0 mt-2 w-64 
+                    ${
+                      theme === 'dark'
+                        ? 'bg-gray-800 text-white border border-gray-700'
+                        : 'bg-white text-gray-800 border border-gray-200'
+                    }
+                    rounded-md shadow-lg z-[100] text-sm
+                  `}
+                >
+                  <div
+                    className={`p-3 border-b ${
+                      theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+                    }`}
+                  >
+                    <h3 className="font-semibold">Options de la barre latérale</h3>
                   </div>
+
                   <div className="p-3 space-y-2">
-                    <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-700 p-2 rounded">
+                    {/* Option de thème */}
+                    <div
+                      className={`
+                        p-2 flex justify-between items-center
+                        ${
+                          theme === 'dark'
+                            ? 'hover:bg-gray-700'
+                            : 'hover:bg-gray-100'
+                        }
+                        rounded cursor-pointer transition-colors
+                      `}
+                      onClick={() => {
+                        toggleTheme();
+                        setSettingsOpen(false);
+                      }}
+                      role="button"
+                      aria-label={`Activer le mode ${theme === 'dark' ? 'clair' : 'sombre'}`}
+                    >
+                      <span>Mode {theme === 'dark' ? 'clair' : 'sombre'}</span>
+                      <div className="flex items-center">
+                        {theme === 'dark' ? (
+                          <Sun size={18} className="text-yellow-400" />
+                        ) : (
+                          <Moon size={18} className="text-gray-600" />
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Option d'ouverture au survol */}
+                    <label
+                      className={`
+                        flex items-center gap-2 cursor-pointer
+                        ${
+                          theme === 'dark'
+                            ? 'hover:bg-gray-700'
+                            : 'hover:bg-gray-100'
+                        }
+                        p-2 rounded transition-colors
+                      `}
+                    >
                       <input
                         type="checkbox"
                         checked={hoverMode}
-                        onChange={() => setHoverMode(!hoverMode)}
-                        className="rounded text-blue-500 focus:ring-blue-500"
+                        onChange={(e) => {
+                          setHoverMode(e.target.checked);
+                          setSettingsOpen(false);
+                        }}
+                        className={`
+                          rounded
+                          ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}
+                          text-blue-500 focus:ring-blue-500
+                        `}
                       />
                       <span>Ouvrir au survol</span>
                     </label>
@@ -258,15 +316,18 @@ const Sidebar: React.FC = () => {
             <input
               type="text"
               placeholder="Rechercher..."
-              className="
+              className={`
                 w-full p-2 rounded-lg 
-                bg-gray-800 text-white 
-                placeholder-gray-400 
+                ${
+                  theme === 'dark'
+                    ? 'bg-gray-800 text-white placeholder-gray-400'
+                    : 'bg-white text-gray-800 placeholder-gray-500'
+                }
                 focus:outline-none 
                 focus:ring-2 
                 focus:ring-blue-500
                 transition-all
-              "
+              `}
             />
           </div>
         )}
@@ -282,7 +343,13 @@ const Sidebar: React.FC = () => {
           {navigationSections.map((section, sectionIndex) => (
             <div key={sectionIndex} className="mb-6">
               {isOpen && (
-                <h2 className="text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider pl-2">
+                <h2 
+                  className={`
+                    text-xs font-semibold
+                    ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}
+                    mb-2 uppercase tracking-wider pl-2
+                  `}
+                >
                   {section.title}
                 </h2>
               )}
@@ -300,7 +367,9 @@ const Sidebar: React.FC = () => {
                       ${
                         isActive
                           ? "bg-blue-600 text-white hover:bg-blue-700"
-                          : "hover:bg-gray-800 text-gray-300 hover:text-white"
+                          : theme === 'dark'
+                            ? "hover:bg-gray-800 text-gray-300 hover:text-white"
+                            : "hover:bg-gray-200 text-gray-700 hover:text-gray-900"
                       }
                     `}
                   >
@@ -325,7 +394,13 @@ const Sidebar: React.FC = () => {
           ))}
 
           {isOpen && (
-            <h2 className="text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider pl-2">
+            <h2 
+              className={`
+                text-xs font-semibold 
+                ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}
+                mb-2 uppercase tracking-wider pl-2
+              `}
+            >
               Système
             </h2>
           )}
@@ -336,9 +411,11 @@ const Sidebar: React.FC = () => {
                 flex items-center
                 p-2 rounded-lg 
                 transition-all 
-                text-gray-300 
-                hover:text-white
-                hover:bg-gray-800
+                ${
+                  theme === 'dark'
+                    ? 'text-gray-300 hover:text-white hover:bg-gray-800'
+                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-200'
+                }
                 ${isOpen ? "pl-3 gap-3" : "justify-center"}
               `}
             >
@@ -362,7 +439,7 @@ const Sidebar: React.FC = () => {
         <button
           onClick={() => {
             console.log("Déconnexion");
-            if (isOpen ) {
+            if (isOpen) {
               closeSidebar();
             }
           }}
@@ -394,4 +471,4 @@ const Sidebar: React.FC = () => {
   );
 };
 
-export { Sidebar };
+export default StandaloneSidebar;

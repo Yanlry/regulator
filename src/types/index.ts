@@ -40,3 +40,4 @@ export interface Ambulance {
     nom: string;
     datePeremption: string;
   }
+  

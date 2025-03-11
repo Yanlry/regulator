@@ -1,13 +1,23 @@
 import React from 'react';
 import { LegendProps } from './types';
 
-const Legend: React.FC<LegendProps> = ({ items }) => {
+/**
+ * Composant de légende pour afficher des indicateurs colorés avec leur signification
+ * Prend en charge les thèmes clair et sombre et les classes Tailwind pour les couleurs
+ */
+const Legend: React.FC<LegendProps> = ({ items, theme = 'light' }) => {
+  const isDark = theme === 'dark';
+  
+  // Classes adaptées au thème
+  const textClass = isDark ? 'text-gray-300' : 'text-gray-600';
+  
   return (
-    <div className="flex flex-wrap items-center gap-4 text-gray-700">
+    <div className="flex flex-wrap gap-6">
       {items.map((item, index) => (
         <div key={index} className="flex items-center">
-          <span className={`w-5 h-5 rounded-full ${item.color} inline-block mr-2`}></span>
-          <span className="text-sm">{item.label}</span>
+          {/* Utiliser la classe directement au lieu du style inline */}
+          <span className={`w-3 h-3 rounded-full mr-2 ${item.color}`}></span>
+          <span className={`text-sm ${textClass}`}>{item.label}</span>
         </div>
       ))}
     </div>

@@ -1,118 +1,56 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { useTheme } from "../../contexts/ThemeContext";
+import { SidebarProps } from "./types";
+import { navigationSections } from "./constants";
+import SidebarSettings from "./SidebarSettings";
 import {
-  Home,
-  Calendar,
-  Users,
-  MapPin,
-  Bell,
-  PlusCircle,
-  List,
   Menu,
-  LogOut,
-  Truck,
-  UserCheck,
-  Briefcase,
-  BarChart,
+  ChevronRight,
   Settings,
   Shield,
-  Command,
-  Moon,
-  Sun,
 } from "lucide-react";
-import { Link, NavLink } from "react-router-dom";
-import { useTheme } from "../../contexts/ThemeContext";
 
 /**
- * Structure de navigation de l'application
+ * Composant principal de la sidebar
  */
-const navigationSections = [
-  {
-    title: "Gestion de la régulation",
-    items: [
-      { icon: Home, label: "Tableau de bord", path: "/" },
-      { icon: Command, label: "Régulation", path: "/regulation" },
-      { icon: PlusCircle, label: "Rendez-vous", path: "/appointments" },
-      { icon: Users, label: "Équipes", path: "/equipes" },
-      { icon: MapPin, label: "Localisation", path: "/localisation" },
-    ],
-  },
-  {
-    title: "Gestion des Véhicules",
-    items: [{ icon: Truck, label: "Ambulances", path: "/ambulances" }],
-  },
-  {
-    title: "Gestion des Patients",
-    items: [
-      { icon: List, label: "Liste des patients", path: "/liste-patients" },
-    ],
-  },
-  {
-    title: "Gestion des Salariés",
-    items: [
-      { icon: Calendar, label: "Planning", path: "/planning" },
-      { icon: UserCheck, label: "Gestion RH", path: "/rh" },
-      { icon: Briefcase, label: "Recrutement", path: "/recrutement" },
-    ],
-  },
-  {
-    title: "Outils et Analyse",
-    items: [
-      { icon: BarChart, label: "Statistiques", path: "/statistiques" },
-      { icon: Bell, label: "Notifications", path: "/notifications" },
-    ],
-  },
-];
-
-/**
- * Interface pour les props du composant StandaloneSidebar
- */
-interface StandaloneSidebarProps {
-  /** Callback appelé quand l'état d'ouverture change */
-  onOpenChange?: (isOpen: boolean) => void;
-  /** État initial d'ouverture */
-  initialOpen?: boolean;
-}
-
-/**
- * Sidebar autonome qui gère son propre état et notifie le parent des changements
- */
-const StandaloneSidebar: React.FC<StandaloneSidebarProps> = ({
+const Sidebar: React.FC<SidebarProps> = ({
   onOpenChange,
   initialOpen = false,
 }) => {
-  // Utiliser le hook de thème
+  const location = useLocation();
   const { theme, toggleTheme } = useTheme();
-  
+
   // État local pour l'ouverture de la sidebar
   const [isOpen, setIsOpen] = useState<boolean>(initialOpen);
-  
+
   // États pour les paramètres
   const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
   const [hoverMode, setHoverMode] = useState<boolean>(() => {
-    const savedHoverMode = localStorage.getItem('hoverMode');
+    const savedHoverMode = localStorage.getItem("hoverMode");
     return savedHoverMode ? JSON.parse(savedHoverMode) : true;
   });
-  
+
   // Refs pour les interactions
-  const settingsRef = useRef<HTMLDivElement>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<number | null>(null);
 
-  // Notifier le parent quand l'état d'ouverture change
+  // Notifier le parent quand l'état change
   useEffect(() => {
     onOpenChange?.(isOpen);
   }, [isOpen, onOpenChange]);
 
-  // Persister le mode survol dans localStorage
+  // Persister le mode hover dans localStorage
   useEffect(() => {
-    localStorage.setItem('hoverMode', JSON.stringify(hoverMode));
+    localStorage.setItem("hoverMode", JSON.stringify(hoverMode));
   }, [hoverMode]);
-  
-  // Fonctions pour gérer l'état d'ouverture
+
+  // Fonctions pour gérer l'état ouvert
   const openSidebar = () => setIsOpen(true);
   const closeSidebar = () => setIsOpen(false);
-  const toggleSidebar = () => setIsOpen(prev => !prev);
-  
-  // Gestion du survol
+  const toggleSidebar = () => setIsOpen((prev) => !prev);
+
+  // Gérer les interactions au survol
   const handleMouseEnter = () => {
     if (hoverMode && !isOpen) {
       if (timeoutRef.current) {
@@ -122,24 +60,25 @@ const StandaloneSidebar: React.FC<StandaloneSidebarProps> = ({
       openSidebar();
     }
   };
-  
+
   const handleMouseLeave = () => {
     if (hoverMode && isOpen) {
-      // Petit délai avant de fermer pour éviter les fermetures accidentelles
       timeoutRef.current = window.setTimeout(() => {
         closeSidebar();
       }, 300);
     }
   };
-  
-  // Détecte les clics en dehors du menu des paramètres
+
+  // Détecter les clics en dehors de la sidebar
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        settingsRef.current &&
-        !settingsRef.current.contains(event.target as Node)
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target as Node) &&
+        isOpen &&
+        window.innerWidth < 1024 // Uniquement sur mobile/tablette
       ) {
-        setSettingsOpen(false);
+        closeSidebar();
       }
     };
 
@@ -147,9 +86,9 @@ const StandaloneSidebar: React.FC<StandaloneSidebarProps> = ({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [settingsRef]);
-  
-  // Nettoie le timeout lorsque le composant est démonté
+  }, [isOpen]);
+
+  // Nettoyage du timeout lors du démontage du composant
   useEffect(() => {
     return () => {
       if (timeoutRef.current !== null) {
@@ -158,317 +97,201 @@ const StandaloneSidebar: React.FC<StandaloneSidebarProps> = ({
     };
   }, []);
 
+  // Fonction pour obtenir la section active en fonction du chemin
+  const getActiveSection = useCallback(() => {
+    const currentPath = location.pathname;
+    for (const section of navigationSections) {
+      if (section.items.some((item) => item.path === currentPath)) {
+        return section.title;
+      }
+    }
+    return null;
+  }, [location.pathname]);
+
+  const activeSection = getActiveSection();
+
   return (
-    <div
-      className={`
-        ${
-          theme === 'dark'
-            ? 'bg-gradient-to-b from-gray-900 to-gray-800 text-white'
-            : 'bg-gradient-to-b from-blue-50 to-gray-100 text-gray-800'
-        }
-        shadow-2xl 
-        transition-all duration-300 
-        fixed left-0 top-0 h-screen 
-        flex flex-col 
-        z-50
-        ${isOpen ? "w-64" : "w-16"}
-      `}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      <div className={`${isOpen ? "p-4 pt-6 pb-2" : "p-2 pt-6 pb-2"}`}>
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <button
-              className={`
-                p-2 rounded-md transition-all
-                ${
-                  theme === 'dark'
-                    ? 'bg-gray-800 hover:bg-gray-700'
-                    : 'bg-gray-200 hover:bg-gray-300'
-                }
-              `}
-              onClick={toggleSidebar}
-              title={isOpen ? "Fermer le menu" : "Ouvrir le menu"}
-            >
-              <Menu size={22} />
-            </button>
-            {isOpen && (
-              <div className="flex items-center gap-2">
-                <Shield size={22} className="text-blue-500" />
-                <h1 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
-                  RÉGULATOR
-                </h1>
-              </div>
-            )}
-          </div>
-
-          {isOpen && (
-            <div className="relative ml-1" ref={settingsRef}>
-              <button
-                className={`
-                  p-2 rounded-md transition-all
-                  ${
-                    theme === 'dark'
-                      ? 'hover:bg-gray-700'
-                      : 'hover:bg-gray-300'
-                  }
-                `}
-                onClick={() => setSettingsOpen(!settingsOpen)}
-                title="Paramètres de la barre latérale"
-              >
-                <Settings
-                  size={20}
-                  className={
-                    theme === 'dark'
-                      ? 'text-gray-300 hover:text-white'
-                      : 'text-gray-600 hover:text-gray-800'
-                  }
-                />
-              </button>
-
-              {/* Menu des paramètres */}
-              {settingsOpen && (
-                <div
-                  className={`
-                    absolute right-0 mt-2 w-64 
-                    ${
-                      theme === 'dark'
-                        ? 'bg-gray-800 text-white border border-gray-700'
-                        : 'bg-white text-gray-800 border border-gray-200'
-                    }
-                    rounded-md shadow-lg z-[100] text-sm
-                  `}
+    <>
+      <div
+        ref={sidebarRef}
+        className={`fixed h-screen transition-all duration-300 ease-in-out
+          ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-gray-900"}
+          ${isOpen ? "left-0 shadow-2xl w-[280px]" : "left-0 shadow-lg w-[80px]"}
+          z-50
+          ${theme === "dark" ? "border-r border-gray-800" : "border-r border-gray-200"}`}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        <div className="flex flex-col h-full">
+          {/* Header */}
+          <div className={`${isOpen ? "px-5" : "px-3"} py-5 flex items-center justify-between`}>
+            <div className="flex items-center gap-3">
+              {isOpen ? (
+                <div className={`relative flex items-center justify-center h-12 w-12 rounded-xl
+                    ${theme === "dark" ? "bg-indigo-500/10" : "bg-indigo-100"}`}>
+                  <Shield size={26} className="text-indigo-500" />
+                </div>
+              ) : (
+                <button
+                  onClick={toggleSidebar}
+                  className={`relative flex items-center justify-center h-12 w-12 rounded-xl transition-all
+                    ${theme === "dark" ? "bg-indigo-500/10 hover:bg-gray-800" : "bg-indigo-100 hover:bg-gray-100"}`}
+                  title="Déployer le menu"
                 >
-                  <div
-                    className={`p-3 border-b ${
-                      theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
-                    }`}
-                  >
-                    <h3 className="font-semibold">Options de la barre latérale</h3>
-                  </div>
+                  <Menu size={26} className="text-indigo-500" />
+                </button>
+              )}
 
-                  <div className="p-3 space-y-2">
-                    {/* Option de thème */}
-                    <div
-                      className={`
-                        p-2 flex justify-between items-center
-                        ${
-                          theme === 'dark'
-                            ? 'hover:bg-gray-700'
-                            : 'hover:bg-gray-100'
-                        }
-                        rounded cursor-pointer transition-colors
-                      `}
-                      onClick={() => {
-                        toggleTheme();
-                        setSettingsOpen(false);
-                      }}
-                      role="button"
-                      aria-label={`Activer le mode ${theme === 'dark' ? 'clair' : 'sombre'}`}
-                    >
-                      <span>Mode {theme === 'dark' ? 'clair' : 'sombre'}</span>
-                      <div className="flex items-center">
-                        {theme === 'dark' ? (
-                          <Sun size={18} className="text-yellow-400" />
-                        ) : (
-                          <Moon size={18} className="text-gray-600" />
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Option d'ouverture au survol */}
-                    <label
-                      className={`
-                        flex items-center gap-2 cursor-pointer
-                        ${
-                          theme === 'dark'
-                            ? 'hover:bg-gray-700'
-                            : 'hover:bg-gray-100'
-                        }
-                        p-2 rounded transition-colors
-                      `}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={hoverMode}
-                        onChange={(e) => {
-                          setHoverMode(e.target.checked);
-                          setSettingsOpen(false);
-                        }}
-                        className={`
-                          rounded
-                          ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}
-                          text-blue-500 focus:ring-blue-500
-                        `}
-                      />
-                      <span>Ouvrir au survol</span>
-                    </label>
+              {isOpen && (
+                <div className="flex flex-col">
+                  <h1 className="font-bold text-xl tracking-wide">RÉGULATOR</h1>
+                  <div className="flex items-center space-x-1">
+                    <span className="h-2 w-2 bg-green-500 rounded-full"></span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      En ligne
+                    </span>
                   </div>
                 </div>
               )}
             </div>
-          )}
-        </div>
 
-        {isOpen && (
-          <div className="mb-4">
-            <input
-              type="text"
-              placeholder="Rechercher..."
-              className={`
-                w-full p-2 rounded-lg 
-                ${
-                  theme === 'dark'
-                    ? 'bg-gray-800 text-white placeholder-gray-400'
-                    : 'bg-white text-gray-800 placeholder-gray-500'
-                }
-                focus:outline-none 
-                focus:ring-2 
-                focus:ring-blue-500
-                transition-all
-              `}
-            />
-          </div>
-        )}
-      </div>
-
-      <div
-        className={`
-          flex-1 overflow-y-auto custom-scrollbar
-          ${isOpen ? "px-4 pr-5" : "px-2"}
-        `}
-      >
-        <div>
-          {navigationSections.map((section, sectionIndex) => (
-            <div key={sectionIndex} className="mb-6">
-              {isOpen && (
-                <h2 
-                  className={`
-                    text-xs font-semibold
-                    ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}
-                    mb-2 uppercase tracking-wider pl-2
-                  `}
-                >
-                  {section.title}
-                </h2>
-              )}
-              <nav className="space-y-2">
-                {section.items.map((item, itemIndex) => (
-                  <NavLink
-                    key={itemIndex}
-                    to={item.path}
-                    className={({ isActive }) => `
-                      flex items-center
-                      p-2 rounded-lg 
-                      transition-all 
-                      group
-                      ${isOpen ? "pl-3 gap-3" : "justify-center"}
-                      ${
-                        isActive
-                          ? "bg-blue-600 text-white hover:bg-blue-700"
-                          : theme === 'dark'
-                            ? "hover:bg-gray-800 text-gray-300 hover:text-white"
-                            : "hover:bg-gray-200 text-gray-700 hover:text-gray-900"
-                      }
-                    `}
-                  >
-                    <div
-                      className={`flex items-center justify-center ${
-                        isOpen ? "w-8 h-8" : "w-10 h-10"
-                      }`}
-                    >
-                      <item.icon
-                        size={22}
-                        className="
-                          group-hover:scale-110 
-                          transition-transform
-                        "
-                      />
-                    </div>
-                    {isOpen && <span className="text-sm">{item.label}</span>}
-                  </NavLink>
-                ))}
-              </nav>
-            </div>
-          ))}
-
-          {isOpen && (
-            <h2 
-              className={`
-                text-xs font-semibold 
-                ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}
-                mb-2 uppercase tracking-wider pl-2
-              `}
-            >
-              Système
-            </h2>
-          )}
-          <nav className="space-y-2 mb-6">
-            <Link
-              to="/parametres"
-              className={`
-                flex items-center
-                p-2 rounded-lg 
-                transition-all 
-                ${
-                  theme === 'dark'
-                    ? 'text-gray-300 hover:text-white hover:bg-gray-800'
-                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-200'
-                }
-                ${isOpen ? "pl-3 gap-3" : "justify-center"}
-              `}
-            >
-              <div
-                className={`flex items-center justify-center ${
-                  isOpen ? "w-8 h-8" : "w-10 h-10"
-                }`}
+            {isOpen && (
+              <button
+                className={`p-2 rounded-xl transition-all
+                  ${theme === "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"}`}
+                onClick={toggleSidebar}
+                title="Réduire le menu"
               >
-                <Settings
-                  size={22}
-                  className="group-hover:scale-110 transition-transform"
+                <ChevronRight size={20} />
+              </button>
+            )}
+          </div>
+
+          {/* Barre de recherche */}
+          {isOpen && (
+            <div className="px-5 mb-4">
+              <div className={`flex items-center gap-2 p-3 rounded-xl
+                ${theme === "dark" ? "bg-gray-800/50" : "bg-gray-100"}`}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 opacity-60"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Rechercher..."
+                  className={`w-full bg-transparent border-none outline-none
+                    text-sm placeholder-gray-500 dark:placeholder-gray-400`}
                 />
               </div>
-              {isOpen && <span className="text-sm">Paramètres</span>}
-            </Link>
-          </nav>
+            </div>
+          )}
+
+          {/* Navigation */}
+          <div className={`flex-1 overflow-y-auto ${isOpen ? "px-3" : "px-2"} hide-scrollbar pt-1`}>
+            {navigationSections.map((section, sectionIndex) => (
+              <div key={sectionIndex} className={`mb-5 ${section.title === activeSection ? "animate-pulse-subtle" : ""}`}>
+                {isOpen && (
+                  <h2 className={`text-xs font-medium mb-3 px-3
+                      ${theme === "dark"
+                        ? section.title === activeSection ? "text-indigo-400" : "text-gray-500"
+                        : section.title === activeSection ? "text-indigo-700" : "text-gray-500"}
+                      ${section.title === activeSection ? "font-bold" : ""}`}>
+                    {section.title}
+                  </h2>
+                )}
+                <div className="space-y-1">
+                  {section.items.map((item, itemIndex) => {
+                    const isActive = location.pathname === item.path;
+                    return (
+                      <Link
+                        key={itemIndex}
+                        to={item.path}
+                        className={`flex items-center gap-3
+                          ${isOpen ? "px-3" : "justify-center px-0"}
+                          py-3 rounded-xl transition-all
+                          ${isActive
+                            ? theme === "dark"
+                              ? "bg-indigo-500/20 text-indigo-400"
+                              : "bg-indigo-100 text-indigo-700"
+                            : theme === "dark"
+                            ? "hover:bg-gray-800"
+                            : "hover:bg-gray-100"}`}
+                      >
+                        <div className={`flex items-center justify-center
+                            ${isActive
+                              ? "text-indigo-500"
+                              : theme === "dark"
+                              ? "text-gray-400"
+                              : "text-gray-500"}
+                            ${isOpen ? "w-6" : "w-12 h-12"}`}>
+                          <item.icon size={22} />
+                        </div>
+                        {isOpen && (
+                          <span className={`text-sm font-medium
+                              ${isActive
+                                ? theme === "dark"
+                                  ? "text-white"
+                                  : "text-indigo-700"
+                                : ""}`}>
+                            {item.label}
+                          </span>
+                        )}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Footer avec paramètres */}
+          <div className={`py-3 mt-auto
+              ${isOpen ? "px-5" : "px-3"}
+              ${theme === "dark" ? "border-t border-gray-800" : "border-t border-gray-200"}`}>
+            <button
+              onClick={() => setSettingsOpen(true)}
+              className={`w-full flex items-center gap-3
+                ${isOpen ? "" : "justify-center"}
+                p-3 rounded-xl transition-all
+                ${theme === "dark" ? "hover:bg-gray-800" : "hover:bg-gray-100"}`}>
+              <Settings size={22} className={`${theme === "dark" ? "text-gray-400" : "text-gray-500"}`} />
+              {isOpen && (
+                <span className="text-sm font-medium">Paramètres</span>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className={`${isOpen ? "p-4 pt-2" : "p-2 pt-2"}`}>
-        <button
-          onClick={() => {
-            console.log("Déconnexion");
-            if (isOpen) {
-              closeSidebar();
-            }
-          }}
-          className={`
-            flex items-center
-            w-full 
-            bg-red-600 hover:bg-red-700 
-            text-white font-semibold 
-            rounded-lg 
-            transition-all
-            group
-            ${isOpen ? "pl-3 gap-3 p-2 justify-start" : "justify-center p-3"}
-          `}
-        >
-          <div
-            className={`flex items-center justify-center ${
-              isOpen ? "w-8 h-8" : "w-6 h-6"
-            }`}
-          >
-            <LogOut
-              size={22}
-              className="group-hover:-translate-x-1 transition-transform"
-            />
-          </div>
-          {isOpen && <span>Déconnexion</span>}
-        </button>
-      </div>
-    </div>
+      {/* Modal des paramètres */}
+      <SidebarSettings
+        isOpen={settingsOpen}
+        theme={theme}
+        hoverMode={hoverMode}
+        toggleTheme={toggleTheme}
+        onHoverModeChange={setHoverMode}
+        onClose={() => setSettingsOpen(false)}
+      />
+
+      {/* Overlay pour mobile */}
+      {isOpen && window.innerWidth < 1024 && (
+        <div
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40"
+          onClick={closeSidebar}
+        />
+      )}
+    </>
   );
 };
 
-export default StandaloneSidebar;
+export default Sidebar;

@@ -94,31 +94,24 @@ function SortableWidget({
 
   const dragHandleClasses = `
     absolute top-3 right-3 z-10 p-1.5 rounded-md shadow-sm opacity-0 group-hover:opacity-100 transition-opacity cursor-grab
-    ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}
+    ${theme === "dark" ? "bg-gray-700" : "bg-white"}
   `;
 
   const dragHandleIconClasses = `
-    ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}
+    ${theme === "dark" ? "text-gray-400" : "text-gray-500"}
   `;
 
   const widgetClasses = `
     h-full w-full rounded-lg shadow overflow-hidden flex flex-col
-    ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}
+    ${theme === "dark" ? "bg-gray-700" : "bg-white"}
   `;
 
   return (
     <div ref={setNodeRef} style={style} className={`group h-full ${className}`}>
-      <div
-        className={dragHandleClasses}
-        {...attributes}
-        {...listeners}
-      >
+      <div className={dragHandleClasses} {...attributes} {...listeners}>
         <GripVertical size={16} className={dragHandleIconClasses} />
       </div>
-      <div
-        className={widgetClasses}
-        style={{ minHeight }}
-      >
+      <div className={widgetClasses} style={{ minHeight }}>
         {children}
       </div>
     </div>
@@ -138,17 +131,17 @@ function AdaptiveWidgetContent({
 }) {
   const headerClasses = `
     flex justify-between items-center p-4 border-b
-    ${theme === 'dark' ? 'border-gray-600' : 'border-gray-100'}
+    ${theme === "dark" ? "border-gray-600" : "border-gray-100"}
   `;
 
   const titleClasses = `
     text-lg font-bold flex items-center
-    ${theme === 'dark' ? 'text-white' : 'text-gray-800'}
+    ${theme === "dark" ? "text-white" : "text-gray-800"}
   `;
 
   const contentClasses = `
     flex-grow p-4 overflow-auto
-    ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}
+    ${theme === "dark" ? "text-gray-200" : "text-gray-800"}
   `;
 
   return (
@@ -172,7 +165,7 @@ function CombinedReturnsList({ theme }: { theme: string }) {
         count={pendingReturns.length}
         description="Patients en attente"
         iconColor="text-red-600"
-        bgColor={theme === 'dark' ? "bg-red-900" : "bg-red-100"}
+        bgColor={theme === "dark" ? "bg-red-900" : "bg-red-100"}
         patients={pendingReturns}
         theme={theme}
       />
@@ -181,7 +174,7 @@ function CombinedReturnsList({ theme }: { theme: string }) {
         count={upcomingReturns.length}
         description="Retours programmés dans les 3h"
         iconColor="text-orange-600"
-        bgColor={theme === 'dark' ? "bg-orange-900" : "bg-orange-100"}
+        bgColor={theme === "dark" ? "bg-orange-900" : "bg-orange-100"}
         patients={upcomingReturns}
         theme={theme}
       />
@@ -207,49 +200,74 @@ function WidgetFilter({
 
   const containerClasses = `
     absolute top-16 right-4 shadow-lg rounded-lg p-4 w-80 z-20 border
-    ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200'}
+    ${
+      theme === "dark"
+        ? "bg-gray-700 border-gray-600"
+        : "bg-white border-gray-200"
+    }
   `;
 
   const headerClasses = `
     flex justify-between items-center mb-4 pb-2
-    ${theme === 'dark' ? 'border-b border-gray-600' : 'border-b border-gray-200'}
+    ${
+      theme === "dark" ? "border-b border-gray-600" : "border-b border-gray-200"
+    }
   `;
 
   const titleClasses = `
     font-medium flex items-center
-    ${theme === 'dark' ? 'text-white' : 'text-gray-800'}
+    ${theme === "dark" ? "text-white" : "text-gray-800"}
   `;
 
   const closeButtonClasses = `
-    ${theme === 'dark' ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'}
+    ${
+      theme === "dark"
+        ? "text-gray-400 hover:text-gray-200"
+        : "text-gray-500 hover:text-gray-700"
+    }
   `;
 
   const showAllButtonClasses = `
     px-3 py-1.5 text-sm rounded
-    ${allVisible
-      ? theme === 'dark' ? 'bg-blue-700 text-blue-100' : 'bg-blue-100 text-blue-700'
-      : theme === 'dark' ? 'bg-gray-600 text-gray-200 hover:bg-gray-500' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+    ${
+      allVisible
+        ? theme === "dark"
+          ? "bg-blue-700 text-blue-100"
+          : "bg-blue-100 text-blue-700"
+        : theme === "dark"
+        ? "bg-gray-600 text-gray-200 hover:bg-gray-500"
+        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
     }
   `;
 
   const hideAllButtonClasses = `
     px-3 py-1.5 text-sm rounded
-    ${!anyVisible
-      ? theme === 'dark' ? 'bg-blue-700 text-blue-100' : 'bg-blue-100 text-blue-700'
-      : theme === 'dark' ? 'bg-gray-600 text-gray-200 hover:bg-gray-500' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+    ${
+      !anyVisible
+        ? theme === "dark"
+          ? "bg-blue-700 text-blue-100"
+          : "bg-blue-100 text-blue-700"
+        : theme === "dark"
+        ? "bg-gray-600 text-gray-200 hover:bg-gray-500"
+        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
     }
   `;
 
   const widgetItemClasses = (visible: boolean) => `
     flex items-center p-2 rounded cursor-pointer
-    ${visible ? 'opacity-100' : 'opacity-70'}
-    ${theme === 'dark' ? 'hover:bg-gray-600' : 'hover:bg-gray-50'}
+    ${visible ? "opacity-100" : "opacity-70"}
+    ${theme === "dark" ? "hover:bg-gray-600" : "hover:bg-gray-50"}
   `;
 
   const widgetTextClasses = (visible: boolean) => `
-    ${visible 
-      ? theme === 'dark' ? 'text-white' : 'text-gray-800' 
-      : theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+    ${
+      visible
+        ? theme === "dark"
+          ? "text-white"
+          : "text-gray-800"
+        : theme === "dark"
+        ? "text-gray-400"
+        : "text-gray-500"
     }
   `;
 
@@ -291,7 +309,12 @@ function WidgetFilter({
             {widget.visible ? (
               <CheckSquare size={18} className="mr-3 text-blue-600" />
             ) : (
-              <Square size={18} className={`mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} />
+              <Square
+                size={18}
+                className={`mr-3 ${
+                  theme === "dark" ? "text-gray-500" : "text-gray-400"
+                }`}
+              />
             )}
             <span className={widgetTextClasses(widget.visible)}>
               {widget.title}
@@ -306,7 +329,7 @@ function WidgetFilter({
 const Dashboard: React.FC<DashboardProps> = () => {
   // Get current theme from context
   const { theme } = useTheme();
-  
+
   const [windowSize, setWindowSize] = useState({
     width: typeof window !== "undefined" ? window.innerWidth : 0,
     height: typeof window !== "undefined" ? window.innerHeight : 0,
@@ -314,16 +337,19 @@ const Dashboard: React.FC<DashboardProps> = () => {
 
   const [showWidgetFilter, setShowWidgetFilter] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
- 
-  useEffect(() => { 
+
+  useEffect(() => {
     const loadDashboardData = async () => {
-      try {  
+      try {
         await new Promise((resolve) => setTimeout(resolve, 1500));
-         
+
         setIsLoading(false);
       } catch (error) {
-        console.error("Erreur lors du chargement des données du tableau de bord:", error);
-        setIsLoading(false);  
+        console.error(
+          "Erreur lors du chargement des données du tableau de bord:",
+          error
+        );
+        setIsLoading(false);
       }
     };
 
@@ -375,7 +401,11 @@ const Dashboard: React.FC<DashboardProps> = () => {
       title: "Suivi des ambulances",
       size: "three-quarters",
       component: (
-        <AmbulanceTracking stats={ambulanceStatsData} activities={[]} theme={theme} />
+        <AmbulanceTracking
+          stats={ambulanceStatsData}
+          activities={[]}
+          theme={theme}
+        />
       ),
       order: 4,
       minHeight: "500px",
@@ -412,7 +442,9 @@ const Dashboard: React.FC<DashboardProps> = () => {
       id: "proximity-transport",
       title: "Transports à proximité",
       size: "full-width",
-      component: <ProximityTransport transports={transportsData} theme={theme} />,
+      component: (
+        <ProximityTransport transports={transportsData} theme={theme} />
+      ),
       order: 8,
       minHeight: "350px",
       visible: true,
@@ -421,8 +453,8 @@ const Dashboard: React.FC<DashboardProps> = () => {
 
   // Re-update widget components when theme changes
   useEffect(() => {
-    setWidgets(prevWidgets => 
-      prevWidgets.map(widget => {
+    setWidgets((prevWidgets) =>
+      prevWidgets.map((widget) => {
         // Create a new component instance with the updated theme
         let updatedComponent;
         switch (widget.id) {
@@ -433,10 +465,18 @@ const Dashboard: React.FC<DashboardProps> = () => {
             updatedComponent = <CombinedReturnsList theme={theme} />;
             break;
           case "transport-table":
-            updatedComponent = <TransportTable transports={transportsData} theme={theme} />;
+            updatedComponent = (
+              <TransportTable transports={transportsData} theme={theme} />
+            );
             break;
           case "ambulance-tracking":
-            updatedComponent = <AmbulanceTracking stats={ambulanceStatsData} activities={[]} theme={theme} />;
+            updatedComponent = (
+              <AmbulanceTracking
+                stats={ambulanceStatsData}
+                activities={[]}
+                theme={theme}
+              />
+            );
             break;
           case "notifications":
             updatedComponent = <Notifications theme={theme} />;
@@ -448,7 +488,9 @@ const Dashboard: React.FC<DashboardProps> = () => {
             updatedComponent = <TransportVolume theme={theme} />;
             break;
           case "proximity-transport":
-            updatedComponent = <ProximityTransport transports={transportsData} theme={theme} />;
+            updatedComponent = (
+              <ProximityTransport transports={transportsData} theme={theme} />
+            );
             break;
           default:
             updatedComponent = widget.component;
@@ -614,7 +656,11 @@ const Dashboard: React.FC<DashboardProps> = () => {
                 {widget.id === "proximity-transport" ? (
                   widget.component
                 ) : (
-                  <AdaptiveWidgetContent title={widget.title} id={widget.id} theme={theme}>
+                  <AdaptiveWidgetContent
+                    title={widget.title}
+                    id={widget.id}
+                    theme={theme}
+                  >
                     {widget.component}
                   </AdaptiveWidgetContent>
                 )}
@@ -628,15 +674,15 @@ const Dashboard: React.FC<DashboardProps> = () => {
 
   // Theme-specific classes
   const containerClasses = `
-    transition-all duration-300 min-h-screen
-    ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}
+   p-4 w-full transition-all duration-300
+    ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}
   `;
-  
+
   const dashboardContainerClasses = `
     transition-all duration-300 min-h-screen p-4
-    ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}
+    ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}
   `;
- 
+
   if (isLoading) {
     return (
       <div className={containerClasses}>

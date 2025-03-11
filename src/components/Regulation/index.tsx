@@ -54,16 +54,15 @@ const Regulation: React.FC<RegulationProps> = ({ isOpen }) => {
               onAutoAssign={() => { /* Add your onAutoAssign logic here */ }}
             />
 
-            <ScheduleGrid
-              ambulances={ambulances}
-              hours={hours}
-              tomorrow={tomorrow}
-              hoveredTimeInfo={hoveredTimeInfo}
-              setHoveredTimeInfo={setHoveredTimeInfo}
-              handleDropCourse={handleDropCourse}
-              handleUnassignCourse={handleUnassignCourse}
-              getCoursesForHour={getCoursesForHour}
-            />
+<ScheduleGrid
+  hours={hours}
+  tomorrow={tomorrow}
+  hoveredTimeInfo={hoveredTimeInfo}
+  setHoveredTimeInfo={setHoveredTimeInfo}
+  handleDropCourse={handleDropCourse}
+  handleUnassignCourse={handleUnassignCourse}
+  getCoursesForHour={getCoursesForHour}
+/>
           </div>
         )}
       </div>

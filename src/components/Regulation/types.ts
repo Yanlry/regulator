@@ -65,6 +65,8 @@ export interface HourBlockProps {
   isAlternateRow: boolean;
   onHoverTimeChange: (hour: number, minute: number) => void;
   onHoverEnd?: () => void;
+  onDragStart?: () => void;
+  onDragEnd?: () => void;
 }
 
 export interface GroupedCoursesCardProps {
@@ -91,7 +93,9 @@ export interface CourseDragPreviewProps {
 
 export interface UnassignedAreaProps {
   courses: Course[];
+  ambulances?: Ambulance[];  // Ajout de cette propriété
   onDropCourse: (courseId: string) => void;
+  onAutoAssign?: (assignedCourses: { [ambulanceId: string]: Course[] }) => void;  // Ajout de cette propriété
 }
 
 export interface ScheduleGridProps {

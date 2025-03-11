@@ -49,7 +49,9 @@ const Regulation: React.FC<RegulationProps> = ({ isOpen }) => {
 
             <UnassignedArea
               courses={unassignedCourses}
+              ambulances={ambulances}
               onDropCourse={handleUnassignCourse}
+              onAutoAssign={() => { /* Add your onAutoAssign logic here */ }}
             />
 
             <ScheduleGrid

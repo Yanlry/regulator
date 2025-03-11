@@ -73,11 +73,13 @@ export interface MapComponentProps {
   activeFilters: FilterOptions;
   filteredAmbulances: Ambulance[];
   handleAmbulanceClick: (id: string) => void;
+  theme: string
 }
 
 export interface DetailPanelProps {
   selectedAmbulance: Ambulance | null | undefined;
   stats: Stats;
+  theme: string
 }
 
 export interface AmbulanceMarkerProps {
@@ -95,8 +97,17 @@ export interface ControlButtonProps {
 }
 
 export interface AmbulanceDetailProps {
-  ambulance: Ambulance;
+  ambulance: Ambulance & {
+    type?: string;
+    bonTransportOk?: boolean;
+    pointDepart?: string;
+    destination?: string | null; // On autorise null
+    heureDepart?: string;
+    // etc...
+  };
+  theme: string;
 }
+
 
 export interface StatCardProps {
   title: string;

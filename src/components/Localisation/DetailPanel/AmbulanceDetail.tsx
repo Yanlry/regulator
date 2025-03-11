@@ -24,7 +24,7 @@ interface ExtendedAmbulanceProps extends AmbulanceDetailProps {
     type?: string;
     bonTransportOk?: boolean;
     pointDepart?: string;
-    destination?: string;
+    destination?: string | null;
     heureDepart?: string;
     heureArrivee?: string;
 

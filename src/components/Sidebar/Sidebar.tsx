@@ -6,7 +6,7 @@ import { navigationSections } from "./constants";
 import SidebarSettings from "./SidebarSettings";
 import {
   Menu,
-  ChevronRight,
+  ChevronLeft,
   Settings,
   Shield,
 } from "lucide-react";
@@ -162,7 +162,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 onClick={toggleSidebar}
                 title="Réduire le menu"
               >
-                <ChevronRight size={20} />
+                <ChevronLeft size={20} />
               </button>
             )}
           </div>

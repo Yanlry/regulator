@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../../contexts/ThemeContext';
 import AppointmentsHeader from '../Appointments/AppointmentsHeader';
 import AppointmentsFilters from '../Appointments/AppointmentsFilters';
 import AppointmentCard from '../Appointments/AppointmentCard';
@@ -14,6 +15,7 @@ interface AppointmentsListProps {
  
 const AppointmentsList: React.FC<AppointmentsListProps> = ({ isOpen }) => { 
   const navigate = useNavigate();
+  const { theme } = useTheme();
    
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -114,8 +116,18 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ isOpen }) => {
     navigate(`/appointments/${appointmentId}/edit`);
   }, [navigate]);
 
+  // Dynamic container classes based on theme
+  const containerClasses = `
+    transition-all duration-300 
+    min-h-screen p-4 
+    ${theme === 'dark' 
+      ? 'bg-gray-900 text-gray-100' 
+      : 'bg-gray-100 text-gray-900'}
+    ${isOpen ? "ml-64" : "ml-16"}
+  `;
+
   return (
-    <div className={`transition-all duration-300 bg-gray-100 min-h-screen p-4 ${isOpen ? "ml-64" : "ml-16"}`}>
+    <div className={containerClasses}>
       <div className="max-w-6xl mx-auto"> 
         <AppointmentsHeader onNewAppointment={handleNewAppointment} />
           
@@ -125,12 +137,16 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ isOpen }) => {
           onDateChange={handleDateChange}
           onStatusChange={handleStatusChange}
           onVehicleTypeChange={handleVehicleTypeChange}
+          theme={theme}
         />
  
         {isLoading ? (
           <LoadingSpinner />
         ) : filteredAppointments.length === 0 ? (
-          <EmptyState message="Aucun rendez-vous trouvé" />
+          <EmptyState 
+            message="Aucun rendez-vous trouvé" 
+            theme={theme} 
+          />
         ) : (
           <div className="space-y-4">
             {filteredAppointments.map((appointment) => (
@@ -139,6 +155,7 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ isOpen }) => {
                 appointment={appointment}
                 onViewDetails={handleViewDetails}
                 onEdit={handleEditAppointment}
+                theme={theme}
               />
             ))}
           </div>

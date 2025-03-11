@@ -33,6 +33,7 @@ interface FilterBarProps {
   setShowDetails: (show: boolean) => void;
   selectedAmbulanceId: string | null;
   showDashboard: () => void;
+  theme: string;
 }
 
 const FilterBar: React.FC<FilterBarProps> = ({
@@ -43,6 +44,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
   setShowDetails,
   selectedAmbulanceId,
   showDashboard,
+  theme,
 }) => {
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
   const filterMenuRef = useRef<HTMLDivElement>(null);
@@ -98,9 +100,10 @@ const FilterBar: React.FC<FilterBarProps> = ({
     };
   }, []);
 
+  // Composant pour afficher les statistiques avec badge
   const StatBadge = ({ color, icon: Icon, label, value }: { 
     color: string, 
-    icon: React.ComponentType<{className?: string}>, 
+    icon: React.ComponentType<{ className?: string }>, 
     label: string, 
     value?: number 
   }) => (
@@ -116,6 +119,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
     ) : null
   );
 
+  // Composant pour le bouton de filtre
   const FilterToggle = ({ 
     filter, 
     label, 
@@ -124,7 +128,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
   }: { 
     filter: keyof FilterOptions, 
     label: string, 
-    icon: React.ComponentType<{className?: string}>,
+    icon: React.ComponentType<{ className?: string }>,
     color?: string 
   }) => (
     <button
@@ -141,13 +145,47 @@ const FilterBar: React.FC<FilterBarProps> = ({
     </button>
   );
 
+  // Définition des classes CSS conditionnelles pour le dark/light theme
+// Container classes for the filter bar
+const containerClasses = `
+  ${theme === 'dark' 
+    ? 'bg-gray-800 border-b border-gray-800 text-white' 
+    : 'bg-white border-b border-gray-200 text-gray-800'}
+  relative z-50 shadow-sm py-3 px-4 transition-colors duration-300
+`;
+
+// Filter button classes with improved contrast and interaction
+const filterButtonClasses = `
+  flex items-center px-3 py-2 rounded-full 
+  ${theme === 'dark'
+    ? 'bg-gray-700 text-gray-100 hover:bg-gray-600' 
+    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}
+  transition-colors duration-300 focus:outline-none focus:ring-2 
+  ${theme === 'dark' 
+    ? 'focus:ring-gray-600' 
+    : 'focus:ring-gray-300'}
+`;
+
+// Filter menu dropdown classes
+const filterMenuClasses = `
+  absolute right-0 mt-2 w-64 max-h-[calc(100vh-100px)] 
+  overflow-y-auto rounded-lg shadow-lg p-4 space-y-3 
+  ${theme === 'dark'
+    ? 'bg-gray-800 border border-gray-700 text-gray-100'
+    : 'bg-white border border-gray-200 text-gray-800'}
+  z-60 transition-colors duration-300
+`;
+
+// Title classes for filter menu sections
+const titleClasses = `
+  text-sm font-bold mb-2 
+  ${theme === 'dark' 
+    ? 'text-gray-300' 
+    : 'text-gray-700'}
+`;
+
   return (
-    <div 
-      className="
-        bg-white border-b border-gray-200 shadow-sm py-3 px-4 
-        relative z-[100] 
-      "
-    >
+    <div className={containerClasses}>
       <div className="flex justify-between items-center">
         <div className="flex space-x-2">
           <StatBadge 
@@ -187,11 +225,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
             <button
               ref={filterButtonRef}
               onClick={toggleFilterMenu}
-              className="
-                flex items-center px-3 py-2 rounded-full 
-                bg-gray-100 text-gray-700 hover:bg-gray-200
-                transition-all duration-300
-              "
+              className={filterButtonClasses}
             >
               <Filter className="mr-2 w-4 h-4" /> Filtres
             </button>
@@ -199,18 +233,11 @@ const FilterBar: React.FC<FilterBarProps> = ({
             {isFilterMenuOpen && (
               <div 
                 ref={filterMenuRef}
-                className="
-                  absolute right-0 mt-2 w-64 max-h-[calc(100vh-100px)] 
-                  overflow-y-auto bg-white 
-                  border border-gray-200 rounded-lg shadow-lg 
-                  p-4 space-y-3 z-[110]
-                "
-                style={{
-                  top: '100%',
-                }}
+                className={filterMenuClasses}
+                style={{ top: '100%' }}
               >
                 <div className="space-y-2">
-                  <h3 className="text-sm font-bold text-gray-700 mb-2">
+                  <h3 className={titleClasses}>
                     Status des Véhicules
                   </h3>
                   <div className="flex space-x-2 flex-wrap gap-2">
@@ -220,7 +247,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
                       icon={CircleCheck}
                       color="green" 
                     />
-                     <FilterToggle 
+                    <FilterToggle 
                       filter="pause" 
                       label="Pause" 
                       icon={PauseCircle}
@@ -232,12 +259,11 @@ const FilterBar: React.FC<FilterBarProps> = ({
                       icon={CircleX}
                       color="red" 
                     />
-                   
                   </div>
                 </div>
 
                 <div className="space-y-2 mt-4">
-                  <h3 className="text-sm font-bold text-gray-700 mb-2">
+                  <h3 className={titleClasses}>
                     Type de Véhicules
                   </h3>
                   <div className="flex space-x-2 flex-wrap gap-2">

@@ -42,26 +42,31 @@ export interface NewAppointmentProps {
 export interface VehicleTypeSelectorProps {
   vehicleType: 'ambulance' | 'vsl';
   setAppointment: React.Dispatch<React.SetStateAction<Appointment>>;
+  theme: string;
 }
 
 export interface PatientInfoProps {
   patient: Patient;
   setAppointment: React.Dispatch<React.SetStateAction<Appointment>>;
+  theme: string;
 }
 
 export interface PickupDetailsProps {
   pickup: PickupInfo;
   setAppointment: React.Dispatch<React.SetStateAction<Appointment>>;
+  theme: string;
 }
 
 export interface DestinationDetailsProps {
   destination: DestinationInfo;
   setAppointment: React.Dispatch<React.SetStateAction<Appointment>>;
+  theme: string;
 }
 
 export interface TransportDetailsProps {
   appointment: Appointment;
   setAppointment: React.Dispatch<React.SetStateAction<Appointment>>;
+  theme: string;
 }
 
 export interface ActionButtonsProps {
@@ -71,4 +76,5 @@ export interface ActionButtonsProps {
 export interface HeaderProps {
   title: string;
   description: string;
+  theme: string
 }

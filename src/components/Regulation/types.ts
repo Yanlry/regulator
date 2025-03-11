@@ -6,6 +6,17 @@ export interface Ambulance {
 
 export interface Course {
   id: string;
+  hour: number;
+title: string;
+  description: string;
+  
+  minute: number;
+
+  duration: number;
+
+  ambulanceId?: string;
+  startTime: string;
+  endTime: string;
   patientName: string;
   pickupAddress: string;
   destinationAddress: string;

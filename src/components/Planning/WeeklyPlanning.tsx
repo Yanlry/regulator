@@ -30,7 +30,7 @@ const WeeklyPlanning: React.FC<WeeklyPlanningProps> = ({
     
     return {
       // Conteneur principal
-      container: `mt-6 p-4 rounded-lg shadow-md ${
+      container: `p-4 rounded-lg shadow-md ${
         isDark ? 'bg-gray-700' : 'bg-white'
       }`,
       

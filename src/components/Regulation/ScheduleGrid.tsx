@@ -1,57 +1,140 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ScheduleGridProps } from '../Regulation/types';   
 import HourBlock from './HourBlock';
 
-
-const ScheduleGrid: React.FC<ScheduleGridProps> = ({
-  ambulances,
-  hours,
+const ScheduleGrid: React.FC<Omit<ScheduleGridProps, 'ambulances'>> = ({
   tomorrow,
-  hoveredTimeInfo,
   setHoveredTimeInfo,
   handleDropCourse,
   handleUnassignCourse,
   getCoursesForHour,
 }) => {
+  // États pour les heures de début et de fin
+  const [startHour, setStartHour] = useState(6);
+  const [endHour, setEndHour] = useState(22);
+
+  // Générer les heures dynamiquement
+  const hours = Array.from({ length: endHour - startHour + 1 }, (_, i) => startHour + i);
+
+  // État pour stocker dynamiquement les ambulances
+  const [ambulances, setAmbulances] = useState([
+    { id: '1', name: 'Ambulance 1', color: 'bg-blue-500' },
+    { id: '2', name: 'Ambulance 2', color: 'bg-green-500' },
+    { id: '3', name: 'Ambulance 3', color: 'bg-purple-500' },
+  ]);
+
+  // État pour stocker les noms modifiables des ambulances
+  const [ambulanceNames, setAmbulanceNames] = useState(
+    ambulances.reduce((acc, ambulance) => {
+      acc[ambulance.id] = ambulance.name;
+      return acc;
+    }, {} as Record<string, string>)
+  );
+
+  // Fonction pour modifier le nom d'une ambulance
+  const handleNameChange = (id: string, newName: string) => {
+    setAmbulanceNames((prev) => ({
+      ...prev,
+      [id]: newName,
+    }));
+  };
+
+  // Ajouter une nouvelle ambulance
+  const addAmbulance = () => {
+    const newId = (ambulances.length + 1).toString();
+    const newAmbulance = { 
+      id: newId, 
+      name: `Ambulance ${newId}`, 
+      color: getRandomColor() 
+    };
+
+    setAmbulances([...ambulances, newAmbulance]);
+    setAmbulanceNames((prev) => ({
+      ...prev,
+      [newId]: newAmbulance.name,
+    }));
+  };
+
+  // Supprimer la dernière ambulance
+  const removeAmbulance = () => {
+    if (ambulances.length > 1) {
+      const updatedAmbulances = [...ambulances];
+      const removedAmbulance = updatedAmbulances.pop(); // Retire la dernière ambulance
+      setAmbulances(updatedAmbulances);
+
+      setAmbulanceNames((prev) => {
+        const newNames = { ...prev };
+        delete newNames[removedAmbulance!.id]; // Supprime du state des noms
+        return newNames;
+      });
+    }
+  };
+
+  // Générer une couleur aléatoire pour l'ambulance
+  const getRandomColor = () => {
+    const colors = ['bg-red-500', 'bg-yellow-500', 'bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500', 'bg-gray-500'];
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
+
   return (
     <div className="bg-white rounded-md shadow-sm overflow-hidden border border-gray-200">
+      
+      {/* Boutons de réglage des heures et du nombre d'ambulances */}
+      <div className="flex justify-between p-4 bg-gray-100">
+        <div className="flex items-center space-x-2">
+          <span className="text-sm font-medium">Début :</span>
+          <button 
+            onClick={() => setStartHour((prev) => Math.max(prev - 1, 0))}
+            className="px-2  bg-gray-300 rounded"
+          >-</button>
+          <span className="text-sm">{startHour}:00</span>
+          <button 
+            onClick={() => setStartHour((prev) => Math.min(prev + 1, endHour - 1))}
+            className="px-2 bg-gray-300 rounded"
+          >+</button>
+        </div>
+
+         {/* Boutons pour ajouter et supprimer des ambulances */}
+         <div className="flex items-center space-x-2">
+          <span className="text-sm font-medium">Ambulances :</span>
+          <button onClick={removeAmbulance} className="px-2 bg-red-500 text-white rounded">-</button>
+          <span className="text-sm">{ambulances.length}</span>
+          <button onClick={addAmbulance} className="px-2  bg-green-500 text-white rounded">+</button>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <span className="text-sm font-medium">Fin :</span>
+          <button 
+            onClick={() => setEndHour((prev) => Math.max(prev - 1, startHour + 1))}
+            className="px-2 bg-gray-300 rounded"
+          >-</button>
+          <span className="text-sm">{endHour}:00</span>
+          <button 
+            onClick={() => setEndHour((prev) => Math.min(prev + 1, 24))}
+            className="px-2 bg-gray-300 rounded"
+          >+</button>
+        </div>
+      </div>
+
+      {/* Conteneur principal */}
       <div className="overflow-x-auto">
         <div className="min-w-max">
-          {/* En-têtes des ambulances */}
+          
+          {/* En-tête */}
           <div className="flex">
-            {/* En-tête de la colonne de temps */}
             <div className="w-16 bg-gray-100 border-b border-r border-gray-200 font-medium text-xs text-gray-500 flex items-center justify-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-3 w-3 mr-0.5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                  clipRule="evenodd"
-                />
-              </svg>
               Heure
             </div>
 
-            {/* En-têtes des ambulances */}
             {ambulances.map((ambulance) => (
               <div key={ambulance.id} className="flex-1 min-w-[200px]">
-                <div
-                  className={`${ambulance.color} text-white p-2 font-medium text-sm flex items-center justify-center shadow-sm`}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-3.5 w-3.5 mr-1"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
-                    <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1v-5h2.05a2.5 2.5 0 014.9 0H19a1 1 0 001-1v-4a1 1 0 00-1-1h-8a1 1 0 00-.8.4L8.65 8H3V4z" />
-                  </svg>
-                  {ambulance.name}
+                <div className={`${ambulance.color} text-white p-2 font-medium text-sm flex items-center justify-center shadow-sm`}>
+                  <input
+                    type="text"
+                    value={ambulanceNames[ambulance.id]}
+                    onChange={(e) => handleNameChange(ambulance.id, e.target.value)}
+                    className="bg-transparent border-none text-white text-center outline-none w-full"
+                  />
                 </div>
               </div>
             ))}
@@ -59,7 +142,6 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = ({
 
           {/* Grille des créneaux horaires */}
           <div className="flex">
-            {/* Colonne des heures avec étiquettes */}
             <div className="w-16 bg-gray-50 border-r border-gray-200">
               {hours.map((hour, index) => (
                 <div
@@ -69,28 +151,14 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = ({
                   }`}
                   style={{ height: "100px" }}
                 >
-                  <div className="flex items-center">
-                    {hoveredTimeInfo && hoveredTimeInfo.hour === hour ? (
-                      <div className="text-blue-700 font-medium">
-                        {`${hour}:${hoveredTimeInfo.minute
-                          .toString()
-                          .padStart(2, "0")}`}
-                      </div>
-                    ) : (
-                      `${hour}:00`
-                    )}
-                  </div>
+                  {`${hour}:00`}
                 </div>
               ))}
             </div>
 
             {/* Colonnes des ambulances */}
             {ambulances.map((ambulance) => (
-              <div
-                key={ambulance.id}
-                className="flex-1 min-w-[200px] border-r border-gray-200"
-              >
-                {/* Blocs horaires */}
+              <div key={ambulance.id} className="flex-1 min-w-[200px] border-r border-gray-200">
                 {hours.map((hour, hourIndex) => (
                   <HourBlock
                     key={`${ambulance.id}-${hour}`}

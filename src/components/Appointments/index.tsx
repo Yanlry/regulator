@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../../contexts/ThemeContext";
 import AppointmentsHeader from "./AppointmentsHeader";
 import AppointmentsFilters from "./AppointmentsFilters";
 import AppointmentCard from "./AppointmentCard";
@@ -14,6 +15,7 @@ interface AppointmentsProps {
 
 const Appointments: React.FC<AppointmentsProps> = () => {
   const navigate = useNavigate();
+  const { theme } = useTheme();
 
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -127,24 +129,33 @@ const Appointments: React.FC<AppointmentsProps> = () => {
     [navigate]
   );
 
+  // Dynamic container classes based on theme
+  const containerClasses = `
+    transition-all duration-300 
+    min-h-screen p-4
+    ${theme === 'dark' 
+      ? 'bg-gray-900 text-gray-100' 
+      : 'bg-gray-100 text-gray-900'}
+  `;
+
+  const spinnerContainerClasses = `
+    flex items-center justify-center 
+    ${theme === 'dark' 
+      ? 'bg-gray-900' 
+      : 'bg-gray-100'}
+    min-h-screen
+  `;
+
   if (isInitialLoading) {
     return (
-      <div className={`
-        transition-all duration-300 
-        bg-gray-100 min-h-screen 
-      `}>
+      <div className={spinnerContainerClasses}>
         <LoadingSpinner />
       </div>
     );
   }
 
   return (
-    <div
-      className={`
-        transition-all duration-300 
-        bg-gray-100 min-h-screen p-4
-      `}
-    >
+    <div className={containerClasses}>
       <div className="max-w-7xl mx-auto">
         <AppointmentsHeader onNewAppointment={handleNewAppointment} />
 
@@ -154,12 +165,16 @@ const Appointments: React.FC<AppointmentsProps> = () => {
           onDateChange={handleDateChange}
           onStatusChange={handleStatusChange}
           onVehicleTypeChange={handleVehicleTypeChange}
+          theme={theme}
         />
 
         {isLoading ? (
           <LoadingSpinner />
         ) : filteredAppointments.length === 0 ? (
-          <EmptyState message="Aucun rendez-vous trouvé" />
+          <EmptyState 
+            message="Aucun rendez-vous trouvé" 
+            theme={theme} 
+          />
         ) : (
           <div className="space-y-4">
             {filteredAppointments.map((appointment) => (
@@ -168,6 +183,7 @@ const Appointments: React.FC<AppointmentsProps> = () => {
                 appointment={appointment}
                 onViewDetails={handleViewDetails}
                 onEdit={handleEditAppointment}
+                theme={theme}
               />
             ))}
           </div>

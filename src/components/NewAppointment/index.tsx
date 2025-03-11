@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../../contexts/ThemeContext';
 import {
   DndContext,
   closestCenter,
@@ -26,13 +27,13 @@ import TransportDetails from './TransportDetails';
 import AppointmentSummary from './AppointementSummary';
 import { Menu, ArrowLeft } from 'lucide-react';
 
-
 interface SortableItemProps {
   id: string;
   children: React.ReactNode;
+  theme: string;
 }
 
-const SortableItem: React.FC<SortableItemProps> = ({ id, children }) => {
+const SortableItem: React.FC<SortableItemProps> = ({ id, children, theme }) => {
   const {
     attributes,
     listeners,
@@ -47,30 +48,36 @@ const SortableItem: React.FC<SortableItemProps> = ({ id, children }) => {
     position: 'relative' as const
   };
 
+  const moveButtonClasses = theme === 'dark'
+    ? "absolute top-3 right-3 z-10 bg-gray-700 hover:bg-gray-600 rounded-full p-2 cursor-move shadow-sm"
+    : "absolute top-3 right-3 z-10 bg-white hover:bg-gray-100 rounded-full p-2 cursor-move shadow-sm";
+
   return (
     <div ref={setNodeRef} style={style} className="relative">
       <div 
         {...attributes} 
         {...listeners}
-        className="absolute top-3 right-3 z-10 bg-white hover:bg-gray-100 rounded-full p-2 cursor-move shadow-sm"
+        className={moveButtonClasses}
         title="Déplacer cette section"
       >
-        <Menu size={18} className="text-gray-500" />
+        <Menu 
+          size={18} 
+          className={theme === 'dark' ? 'text-gray-300' : 'text-gray-500'} 
+        />
       </div>
       {children}
     </div>
   );
 };
 
-
 interface ComponentOrder {
   id: string;
   name: string;
 }
 
-
 const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
   const navigate = useNavigate();
+  const { theme } = useTheme();
 
   const [currentStep, setCurrentStep] = useState<'form' | 'summary'>('form');
   const [appointment, setAppointment] = useState<Appointment>({
@@ -132,7 +139,6 @@ const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
       });
     }
   }, []);
- 
 
   const handleContinue = useCallback((e: React.FormEvent): void => {
     e.preventDefault();
@@ -163,6 +169,7 @@ const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
           <VehicleTypeSelector
             vehicleType={appointment.vehicleType}
             setAppointment={setAppointment}
+            theme={theme}
           />
         );
       case 'locations':
@@ -171,10 +178,12 @@ const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
             <PickupDetails 
               pickup={appointment.pickup}
               setAppointment={setAppointment}
+              theme={theme}
             />
             <DestinationDetails 
               destination={appointment.destination}
               setAppointment={setAppointment}
+              theme={theme}
             />
           </div>
         );
@@ -183,6 +192,7 @@ const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
           <PatientInfo 
             patient={appointment.patient}
             setAppointment={setAppointment}
+            theme={theme}
           />
         );
       case 'transport':
@@ -190,40 +200,65 @@ const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
           <TransportDetails 
             appointment={appointment}
             setAppointment={setAppointment}
+            theme={theme}
           />
         );
       default:
         return null;
     }
-  }, [appointment, setAppointment]);
+  }, [appointment, setAppointment, theme]);
+
+  // Dynamic container classes based on theme
+  const containerClasses = `
+    transition-all duration-300 min-h-screen absolute right-0
+    ${theme === 'dark' 
+      ? 'bg-gray-900 text-gray-100' 
+      : 'bg-gray-100 text-gray-900'}
+  `;
+
+  // Dynamic button classes
+  const cancelButtonClasses = theme === 'dark'
+    ? "px-4 py-2 border border-gray-700 rounded-md shadow-sm text-gray-300 bg-gray-800 hover:bg-gray-700"
+    : "px-4 py-2 border border-gray-300 rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50";
+
+  const continueButtonClasses = theme === 'dark'
+    ? "px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-blue-800 hover:bg-blue-700"
+    : "px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700";
 
   return (
-    <div className={`transition-all duration-300 bg-gray-100 min-h-screen ${isOpen ? "ml-64" : "ml-16"}`}>
+    <div 
+      className={containerClasses}
+      style={{ 
+        left: isOpen ? '280px' : '80px' 
+      }}
+    >
       <div className="max-w-6xl mx-auto p-4">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center">
-            {/* Masquer le bouton de retour en arrière lorsqu'on est à l'étape récapitulative */}
             {currentStep === 'form' && (
               <button 
                 onClick={handleCancel}
-                className="mr-4 p-2 rounded-full hover:bg-gray-200 transition-colors"
+                className={`mr-4 p-2 rounded-full hover:bg-gray-200 transition-colors ${theme === 'dark' ? 'hover:bg-gray-700' : ''}`}
                 aria-label="Retour à la liste des rendez-vous"
               >
-                <ArrowLeft size={24} className="text-gray-700" />
+                <ArrowLeft 
+                  size={24} 
+                  className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} 
+                />
               </button>
             )}
             <Header 
               title="Nouveau Rendez-vous de Transport" 
               description="Créez un nouveau rendez-vous de transport en ambulance" 
+              theme={theme}
             />
           </div>
           
-          {/* Afficher le bouton de retour au formulaire uniquement à l'étape récapitulative */}
           {currentStep === 'summary' && (
             <button 
               type="button" 
               onClick={handleBackToForm}
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 flex items-center"
+              className={`flex items-center ${cancelButtonClasses}`}
             >
               <ArrowLeft size={16} className="mr-2" />
               Retour au formulaire
@@ -244,7 +279,11 @@ const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
               >
                 <div className="space-y-6">
                   {componentsOrder.map((component) => (
-                    <SortableItem key={component.id} id={component.id}>
+                    <SortableItem 
+                      key={component.id} 
+                      id={component.id}
+                      theme={theme}
+                    >
                       {renderComponent(component.id)}
                     </SortableItem>
                   ))}
@@ -252,17 +291,17 @@ const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
               </SortableContext>
             </DndContext>
           
-            <div className="pt-4 border-t border-gray-200 flex justify-end space-x-3">
+            <div className={`pt-4 border-t ${theme === 'dark' ? 'border-gray-800' : 'border-gray-200'} flex justify-end space-x-3`}>
               <button 
                 type="button" 
                 onClick={handleCancel}
-                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50"
+                className={cancelButtonClasses}
               >
                 Annuler
               </button>
               <button 
                 type="submit" 
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+                className={continueButtonClasses}
               >
                 Continuer au récapitulatif
               </button>
@@ -273,9 +312,8 @@ const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
             <AppointmentSummary 
               appointment={appointment} 
               onSubmit={handleSubmit}
+              theme={theme}
             />
-            
-            {/* Bouton Retour au formulaire déplacé dans l'en-tête */}
           </div>
         )}
       </div>

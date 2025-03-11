@@ -3,6 +3,7 @@ import React from 'react';
 interface EmptyStateProps {
   message: string;
   description?: string;
+  theme: string;
 }
 
 const EmptyState: React.FC<EmptyStateProps> = ({ message, description }) => {

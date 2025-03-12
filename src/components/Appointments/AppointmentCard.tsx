@@ -17,7 +17,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
 }) => {
   const cardClasses = useMemo(() => 
     theme === 'dark' 
-      ? 'bg-gray-800 text-gray-100 hover:bg-gray-700 border border-gray-700' 
+      ? 'bg-gray-700 text-gray-100 hover:bg-gray-700 border border-gray-700' 
       : 'bg-white text-gray-900 hover:shadow-md',
     [theme]
   );

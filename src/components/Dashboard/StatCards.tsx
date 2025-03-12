@@ -45,7 +45,7 @@ const StatCards: React.FC<StatCardsProps> = ({ theme }) => {
       {stats.map((stat, index) => (
         <div 
           key={index} 
-          className={`${theme === 'dark' ? 'bg-gray-700' : 'bg-white'} rounded-xl shadow-md p-6 flex items-start justify-between`}
+          className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-md p-6 flex items-start justify-between`}
         >
           <div>
             <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'} text-sm`}>

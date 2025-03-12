@@ -2,12 +2,25 @@ import React from 'react';
 import { CourseDragPreviewProps } from '../Regulation/types';
 import { formatTime } from '../Regulation/utils';
 
-const CourseDragPreview: React.FC<CourseDragPreviewProps> = ({ preview }) => {
+// Interface pour les props du composant avec le thème
+interface ThemeAwareCourseDragPreviewProps extends Omit<CourseDragPreviewProps, 'theme'> {
+  theme?: 'dark' | 'light';
+}
+
+const CourseDragPreview: React.FC<ThemeAwareCourseDragPreviewProps> = ({ preview, theme = 'light' }) => {
   if (!preview || !preview.isVisible || !preview.time) return null;
+
+  // Classes CSS adaptatives selon le thème
+  const previewClasses = `
+    fixed pointer-events-none px-2 py-1 text-xs rounded shadow-lg z-50 flex items-center
+    ${theme === 'dark' 
+      ? 'bg-blue-800 text-blue-100' 
+      : 'bg-blue-600 text-white'}
+  `;
 
   return (
     <div
-      className="fixed pointer-events-none bg-blue-600 text-white px-2 py-1 text-xs rounded shadow-lg z-50 flex items-center"
+      className={previewClasses}
       style={{ left: preview.x + 15, top: preview.y + 15 }}
     >
       <svg

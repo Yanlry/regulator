@@ -7,9 +7,9 @@ export interface Ambulance {
 export interface Course {
   id: string;
   hour: number;
-title: string;
+  title: string;
   description: string;
-  
+
   minute: number;
 
   duration: number;
@@ -76,6 +76,7 @@ export interface GroupedCoursesCardProps {
 }
 
 export interface UnassignedCourseCardProps {
+  theme: string;
   course: Course;
 }
 
@@ -85,22 +86,25 @@ export interface ScheduledCourseCardProps {
   onRemove?: () => void;
   isCompact?: boolean;
   hasCollision?: boolean;
+  theme: string;
 }
 
 export interface CourseDragPreviewProps {
   preview: DropPreviewData | null;
+  theme: string;
 }
 
 export interface UnassignedAreaProps {
   courses: Course[];
-  ambulances?: Ambulance[];  // Ajout de cette propriété
+  ambulances?: Ambulance[]; // Ajout de cette propriété
   onDropCourse: (courseId: string) => void;
-  onAutoAssign?: (assignedCourses: { [ambulanceId: string]: Course[] }) => void;  // Ajout de cette propriété
+  onAutoAssign?: (assignedCourses: { [ambulanceId: string]: Course[] }) => void; // Ajout de cette propriété
 }
 
 export interface ScheduleGridProps {
   ambulances: Ambulance[];
   hours: number[];
+  theme: string;
   tomorrow: Date;
   hoveredTimeInfo: { hour: number; minute: number } | null;
   setHoveredTimeInfo: (info: { hour: number; minute: number } | null) => void;
@@ -116,4 +120,6 @@ export interface ScheduleGridProps {
 
 export interface ScheduleHeaderProps {
   tomorrow: Date;
+  theme: string;
+
 }

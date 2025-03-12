@@ -6,9 +6,15 @@ import { DropTargetMonitor, DragSourceMonitor } from 'react-dnd';
 import { Course, DragItem, Ambulance } from '../Regulation/types';
 import { formatTime } from '../Regulation/utils';
 import { UnassignedCourseCardProps } from '../Regulation/types';
+import { useTheme } from '../../contexts/ThemeContext';
+
+// Interface étendue pour inclure le thème
+interface ThemeAwareCourseCardProps extends UnassignedCourseCardProps {
+  theme: 'dark' | 'light';
+}
 
 // Carte de course compacte pour l'affichage après assignation
-const CompactCourseCard: React.FC<UnassignedCourseCardProps> = ({ course }) => {
+const CompactCourseCard: React.FC<ThemeAwareCourseCardProps> = ({ course, theme }) => {
   const [{ isDragging }, drag, preview] = useDrag(() => ({
     type: "COURSE",
     item: {
@@ -28,17 +34,21 @@ const CompactCourseCard: React.FC<UnassignedCourseCardProps> = ({ course }) => {
   return (
     <div
       ref={drag}
-      className={`p-1.5 rounded shadow-sm bg-white border border-gray-200
+      className={`p-1.5 rounded shadow-sm border
         ${isDragging ? "opacity-50" : "opacity-100"} cursor-grab hover:shadow 
-        transition-shadow duration-200 flex items-center text-sm w-full h-10`}
+        transition-shadow duration-200 flex items-center text-sm w-full h-10
+        ${theme === 'dark' 
+          ? 'bg-gray-700 border-gray-600 text-gray-200' 
+          : 'bg-white border-gray-200 text-gray-800'}`}
     >
-      <div className="flex-shrink-0 text-xs font-medium text-blue-600 w-12">
+      <div className={`flex-shrink-0 text-xs font-medium w-12 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
         {formatTime(course.appointmentTime)}
       </div>
-      <div className="font-medium text-gray-800 text-xs truncate mx-1.5 flex-grow">
+      <div className={`font-medium text-xs truncate mx-1.5 flex-grow ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>
         {course.patientName || 'Patient'}
       </div>
-      <div className="flex-shrink-0 text-xs text-gray-500 truncate bg-gray-50 px-1.5 py-0.5 rounded-full">
+      <div className={`flex-shrink-0 text-xs truncate px-1.5 py-0.5 rounded-full 
+        ${theme === 'dark' ? 'bg-gray-600 text-gray-300' : 'bg-gray-50 text-gray-500'}`}>
         {course.destinationAddress?.split(' ')[0] || 'Destination'}
       </div>
     </div>
@@ -46,7 +56,7 @@ const CompactCourseCard: React.FC<UnassignedCourseCardProps> = ({ course }) => {
 };
 
 // Carte de course standard pour l'affichage avant assignation
-const RegularCourseCard: React.FC<UnassignedCourseCardProps> = ({ course }) => {
+const RegularCourseCard: React.FC<ThemeAwareCourseCardProps> = ({ course, theme }) => {
   const [{ isDragging }, drag, preview] = useDrag(() => ({
     type: "COURSE",
     item: {
@@ -66,11 +76,14 @@ const RegularCourseCard: React.FC<UnassignedCourseCardProps> = ({ course }) => {
   return (
     <div
       ref={drag}
-      className={`p-2 rounded shadow-sm bg-white border border-gray-200
+      className={`p-2 rounded shadow-sm border
         ${isDragging ? "opacity-50" : "opacity-100"} cursor-grab hover:shadow 
-        transition-shadow duration-200 w-[180px]`}
+        transition-shadow duration-200 w-[180px]
+        ${theme === 'dark' 
+          ? 'bg-gray-700 border-gray-600' 
+          : 'bg-white border-gray-200'}`}
     >
-      <div className="flex items-center text-xs text-blue-600 font-medium mb-1">
+      <div className={`flex items-center text-xs font-medium mb-1 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-3 w-3 mr-1"
@@ -85,10 +98,10 @@ const RegularCourseCard: React.FC<UnassignedCourseCardProps> = ({ course }) => {
         </svg>
         {formatTime(course.appointmentTime)}
       </div>
-      <div className="font-medium text-gray-800 text-sm truncate mb-1">
+      <div className={`font-medium text-sm truncate mb-1 ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>
         {course.patientName}
       </div>
-      <div className="text-xs text-gray-500 truncate mb-0.5 flex items-start">
+      <div className={`text-xs truncate mb-0.5 flex items-start ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-3 w-3 mr-1 mt-0.5 flex-shrink-0"
@@ -103,7 +116,7 @@ const RegularCourseCard: React.FC<UnassignedCourseCardProps> = ({ course }) => {
         </svg>
         <span className="truncate">{course.pickupAddress}</span>
       </div>
-      <div className="text-xs text-gray-500 truncate flex items-start">
+      <div className={`text-xs truncate flex items-start ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-3 w-3 mr-1 mt-0.5 flex-shrink-0"
@@ -142,6 +155,9 @@ const UnassignedArea: React.FC<UnassignedAreaProps> = ({
   onDropCourse,
   onAutoAssign 
 }) => {
+  // Récupérer le thème du contexte
+  const { theme } = useTheme();
+
   // Configuration de react-dnd pour le drop
   const [{ isOver }, drop] = useDrop<DragItem, void, { isOver: boolean }>(() => ({
     accept: "COURSE",
@@ -184,6 +200,65 @@ const UnassignedArea: React.FC<UnassignedAreaProps> = ({
     }
   });
   const [ambulanceCount, setAmbulanceCount] = useState(ambulanceConfigs.length);
+
+  // Classes CSS adaptatives selon le thème
+  const cardClasses = `
+    border p-4 mb-5 rounded-md shadow-sm transition-colors duration-200
+    ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200'}
+    ${isOver ? theme === 'dark' ? 'border-blue-500 bg-gray-600' : 'border-blue-300 bg-blue-50' : ''}
+  `;
+
+  const headerClasses = `
+    text-base font-semibold flex items-center 
+    ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}
+  `;
+
+  const buttonPrimaryClasses = `
+    px-4 py-2 rounded-md transition-colors
+    ${theme === 'dark' ? 'bg-gray-600 text-white hover:bg-gray-700' : 'bg-gray-600 text-white hover:bg-gray-700'}
+  `;
+
+  const buttonSecondaryClasses = `
+    px-3 py-1 rounded-md text-sm transition-colors
+    ${theme === 'dark' ? 'bg-gray-600 text-gray-300 hover:bg-gray-700' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}
+  `;
+
+  const linkClasses = `
+    text-sm hover:underline
+    ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}
+  `;
+
+  const statsCardClasses = `
+    border p-2 rounded-md
+    ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-white border-blue-100'}
+  `;
+
+  const ambulanceHeaderClasses = `
+    flex items-center p-2 rounded-t-md border-b cursor-pointer hover:bg-gray-100
+    ${theme === 'dark' 
+      ? 'bg-gray-600 border-gray-500 hover:bg-gray-500' 
+      : 'bg-gray-50 border-gray-200 hover:bg-gray-100'}
+  `;
+
+  const modalOverlayClasses = `
+    fixed inset-0 flex items-center justify-center z-50
+    ${theme === 'dark' ? 'bg-black bg-opacity-70' : 'bg-black bg-opacity-50'}
+  `;
+
+  const modalContentClasses = `
+    rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto
+    ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'}
+  `;
+
+  const inputClasses = `
+    p-2 border rounded-md
+    ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300 text-gray-700'}
+  `;
+
+  const ambulanceConfigClasses = `
+    grid grid-cols-12 gap-2 p-3 border rounded-md
+    ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'}
+  `;
 
   // Générer une couleur aléatoire pour l'ambulance
   function getRandomColor() {
@@ -310,15 +385,17 @@ const UnassignedArea: React.FC<UnassignedAreaProps> = ({
   }) => (
     <div 
       onClick={toggleExpand}
-      className="flex items-center p-2 bg-gray-50 rounded-t-md border-b border-gray-200 cursor-pointer hover:bg-gray-100"
+      className={ambulanceHeaderClasses}
     >
       <div className={`w-3 h-3 rounded-full ${color} mr-2`}></div>
-      <h4 className="font-medium text-gray-800 text-sm">{name}</h4>
-      <span className="text-xs font-medium bg-blue-100 text-blue-800 ml-auto rounded-full px-2 py-0.5">
+      <h4 className={`font-medium text-sm ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>{name}</h4>
+      <span className={`text-xs font-medium ml-auto rounded-full px-2 py-0.5 
+        ${theme === 'dark' ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'}`}>
         {count} course{count > 1 ? 's' : ''}
       </span>
       <svg 
-        className={`w-4 h-4 ml-2 text-gray-500 transform transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+        className={`w-4 h-4 ml-2 transform transition-transform ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} 
+        ${isExpanded ? 'rotate-180' : ''}`}
         fill="none" 
         viewBox="0 0 24 24" 
         stroke="currentColor"
@@ -333,11 +410,11 @@ const UnassignedArea: React.FC<UnassignedAreaProps> = ({
     <>
       <div className="flex flex-wrap gap-2">
         {displayedCourses.map((course) => (
-          <RegularCourseCard key={course.id} course={course} />
+          <RegularCourseCard key={course.id} course={course} theme={theme} />
         ))}
 
         {courses.length === 0 && (
-          <div className="text-sm text-gray-500 italic py-2">
+          <div className={`text-sm italic py-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
             Toutes les courses ont été affectées
           </div>
         )}
@@ -346,7 +423,7 @@ const UnassignedArea: React.FC<UnassignedAreaProps> = ({
       {courses.length > 15 && (
         <button
           onClick={() => setShowAllCourses(!showAllCourses)}
-          className="mt-2 text-blue-600 text-sm hover:underline"
+          className={linkClasses}
         >
           {showAllCourses ? "Voir moins" : "Voir tout"}
         </button>
@@ -358,7 +435,9 @@ const UnassignedArea: React.FC<UnassignedAreaProps> = ({
   const renderAssignedCourses = () => {
     // Si pas d'ambulances configurées ou pas de courses assignées, ne rien afficher
     if (ambulanceConfigs.length === 0 || Object.keys(assignedCoursesState).length === 0) {
-      return <div className="text-sm text-gray-500 italic py-2">Aucune course assignée</div>;
+      return <div className={`text-sm italic py-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+        Aucune course assignée
+      </div>;
     }
 
     // Statistiques d'assignation
@@ -371,23 +450,33 @@ const UnassignedArea: React.FC<UnassignedAreaProps> = ({
     return (
       <div className="space-y-4">
         {/* Statistiques d'assignation */}
-        <div className="bg-white border border-blue-100 rounded-md p-2">
-          <h3 className="text-sm font-medium text-blue-700 mb-2">Statistiques d'assignation</h3>
+        <div className={statsCardClasses}>
+          <h3 className={`text-sm font-medium mb-2 ${theme === 'dark' ? 'text-blue-300' : 'text-blue-700'}`}>
+            Statistiques d'assignation
+          </h3>
           <div className="grid grid-cols-4 gap-2 text-center">
             <div>
-              <div className="text-xs text-gray-500">Total des courses</div>
+              <div className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                Total des courses
+              </div>
               <div className="font-semibold">{totalCourses}</div>
             </div>
             <div>
-              <div className="text-xs text-gray-500">Courses assignées</div>
+              <div className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                Courses assignées
+              </div>
               <div className="font-semibold">{assignedCourses}</div>
             </div>
             <div>
-              <div className="text-xs text-gray-500">Ambulances utilisées</div>
+              <div className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                Ambulances utilisées
+              </div>
               <div className="font-semibold">{usedAmbulances}</div>
             </div>
             <div>
-              <div className="text-xs text-gray-500">Hors plage horaire</div>
+              <div className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                Hors plage horaire
+              </div>
               <div className="font-semibold">0</div>
             </div>
           </div>
@@ -409,7 +498,8 @@ const UnassignedArea: React.FC<UnassignedAreaProps> = ({
             });
             
             return (
-              <div key={config.id} className="border border-gray-200 rounded-md overflow-hidden">
+              <div key={config.id} className={`border rounded-md overflow-hidden 
+                ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
                 <AmbulanceHeader 
                   name={config.name}
                   color={config.color}
@@ -419,9 +509,10 @@ const UnassignedArea: React.FC<UnassignedAreaProps> = ({
                 />
                 
                 {isExpanded && (
-                  <div className="p-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1.5">
+                  <div className={`p-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1.5
+                    ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>
                     {sortedCourses.map((course) => (
-                      <CompactCourseCard key={course.id} course={course} />
+                      <CompactCourseCard key={course.id} course={course} theme={theme} />
                     ))}
                   </div>
                 )}
@@ -433,7 +524,7 @@ const UnassignedArea: React.FC<UnassignedAreaProps> = ({
         <div className="flex justify-end mt-2">
           <button
             onClick={resetAssignment}
-            className="px-3 py-1 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors text-sm"
+            className={buttonSecondaryClasses}
           >
             Réinitialiser l'assignation
           </button>
@@ -446,11 +537,10 @@ const UnassignedArea: React.FC<UnassignedAreaProps> = ({
     <>
       <div
         ref={drop}
-        className={`bg-white border border-gray-200 p-4 mb-5 rounded-md shadow-sm transition-colors duration-200
-          ${isOver ? "border-blue-300 bg-blue-50" : ""}`}
+        className={cardClasses}
       >
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-base font-semibold flex items-center text-gray-700">
+          <h3 className={headerClasses}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-4 w-4 mr-1.5"
@@ -464,7 +554,7 @@ const UnassignedArea: React.FC<UnassignedAreaProps> = ({
           
           {onAutoAssign && (
             <button
-              className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+              className={buttonPrimaryClasses}
               onClick={() => isAutoAssigned ? resetAssignment() : setShowConfigModal(true)}
             >
               {isAutoAssigned ? "Réinitialiser" : "Configuration et répartition"}
@@ -477,13 +567,15 @@ const UnassignedArea: React.FC<UnassignedAreaProps> = ({
 
       {/* Modal de configuration */}
       {showConfigModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className={modalOverlayClasses}>
+          <div className={modalContentClasses}>
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-gray-800">Configuration de la répartition</h2>
+              <h2 className={`text-xl font-bold ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>
+                Configuration de la répartition
+              </h2>
               <button 
                 onClick={() => setShowConfigModal(false)}
-                className="text-gray-500 hover:text-gray-700"
+                className={`hover:text-gray-700 ${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'}`}
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -492,7 +584,7 @@ const UnassignedArea: React.FC<UnassignedAreaProps> = ({
             </div>
 
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                 Marge entre les courses (en minutes)
               </label>
               <input
@@ -501,26 +593,32 @@ const UnassignedArea: React.FC<UnassignedAreaProps> = ({
                 max="120"
                 value={marginMinutes}
                 onChange={(e) => setMarginMinutes(parseInt(e.target.value) || 0)}
-                className="w-full p-2 border border-gray-300 rounded-md"
+                className={inputClasses + " w-full"}
               />
             </div>
 
             <div className="mb-6">
               <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   Nombre d'ambulances
                 </label>
                 <div className="flex items-center">
                   <button
                     onClick={() => updateAmbulanceCount(Math.max(1, ambulanceCount - 1))}
-                    className="px-2 py-1 bg-gray-200 text-gray-700 rounded-l-md hover:bg-gray-300"
+                    className={`px-2 py-1 rounded-l-md ${theme === 'dark' 
+                      ? 'bg-gray-600 text-gray-300 hover:bg-gray-500' 
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
                   >
                     -
                   </button>
-                  <span className="px-4 py-1 bg-gray-100">{ambulanceCount}</span>
+                  <span className={`px-4 py-1 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                    {ambulanceCount}
+                  </span>
                   <button
                     onClick={() => updateAmbulanceCount(ambulanceCount + 1)}
-                    className="px-2 py-1 bg-gray-200 text-gray-700 rounded-r-md hover:bg-gray-300"
+                    className={`px-2 py-1 rounded-r-md ${theme === 'dark' 
+                      ? 'bg-gray-600 text-gray-300 hover:bg-gray-500' 
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
                   >
                     +
                   </button>
@@ -529,12 +627,14 @@ const UnassignedArea: React.FC<UnassignedAreaProps> = ({
             </div>
 
             <div className="mb-6">
-              <h3 className="text-sm font-medium text-gray-700 mb-2">Configuration des ambulances</h3>
+              <h3 className={`text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                Configuration des ambulances
+              </h3>
               <div className="space-y-4 max-h-[40vh] overflow-y-auto p-2">
                 {ambulanceConfigs.map((config, index) => (
                   <div 
                     key={`ambulance-config-${index}`}
-                    className="grid grid-cols-12 gap-2 p-3 border border-gray-200 rounded-md bg-gray-50"
+                    className={ambulanceConfigClasses}
                   >
                     <div className="col-span-1 flex items-center justify-center">
                       <div className={`w-4 h-4 rounded-full ${config.color}`}></div>
@@ -545,36 +645,44 @@ const UnassignedArea: React.FC<UnassignedAreaProps> = ({
                         value={config.name}
                         placeholder="Nom"
                         onChange={(e) => updateAmbulanceConfig(index, 'name', e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded-md"
+                        className={inputClasses + " w-full"}
                       />
                     </div>
                     <div className="col-span-4 flex items-center">
-                      <span className="text-sm text-gray-500 mr-2">Disponible de</span>
+                      <span className={`text-sm mr-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                        Disponible de
+                      </span>
                       <input
                         type="number"
                         min="0"
                         max="23"
                         value={config.startHour}
                         onChange={(e) => updateAmbulanceConfig(index, 'startHour', parseInt(e.target.value) || 0)}
-                        className="w-16 p-2 border border-gray-300 rounded-md"
+                        className={inputClasses + " w-16"}
                       />
-                      <span className="text-sm text-gray-500 mx-1">h à</span>
+                      <span className={`text-sm mx-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                        h à
+                      </span>
                       <input
                         type="number"
                         min="0"
                         max="24"
                         value={config.endHour}
                         onChange={(e) => updateAmbulanceConfig(index, 'endHour', parseInt(e.target.value) || 0)}
-                        className="w-16 p-2 border border-gray-300 rounded-md"
+                        className={inputClasses + " w-16"}
                       />
-                      <span className="text-sm text-gray-500 ml-1">h</span>
+                      <span className={`text-sm ml-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                        h
+                      </span>
                     </div>
                     <div className="col-span-4 flex items-center gap-2">
-                      <label className="text-sm text-gray-500">Couleur</label>
+                      <label className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                        Couleur
+                      </label>
                       <select
                         value={config.color}
                         onChange={(e) => updateAmbulanceConfig(index, 'color', e.target.value)}
-                        className="p-2 border border-gray-300 rounded-md"
+                        className={inputClasses}
                       >
                         <option value="bg-red-500">Rouge</option>
                         <option value="bg-blue-500">Bleu</option>
@@ -593,13 +701,17 @@ const UnassignedArea: React.FC<UnassignedAreaProps> = ({
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => setShowConfigModal(false)}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+                className={`px-4 py-2 rounded-md transition-colors ${theme === 'dark' 
+                  ? 'bg-gray-600 text-gray-300 hover:bg-gray-700' 
+                  : 'bg-gray-300 text-gray-700 hover:bg-gray-400'}`}
               >
                 Annuler
               </button>
               <button
                 onClick={autoAssignCourses}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                className={`px-4 py-2 rounded-md transition-colors ${theme === 'dark' 
+                  ? 'bg-blue-700 text-white hover:bg-blue-800' 
+                  : 'bg-blue-600 text-white hover:bg-blue-700'}`}
               >
                 Répartir les courses
               </button>

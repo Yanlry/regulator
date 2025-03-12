@@ -1,12 +1,23 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { GroupedCoursesCardProps } from '../Regulation/types';
 import { formatTime, getAmbulanceColorClass } from '../Regulation/utils';
+import { useTheme } from '../../contexts/ThemeContext';
 
-const GroupedCoursesCard: React.FC<GroupedCoursesCardProps> = ({
+// Extension de l'interface pour inclure le thème
+interface ThemeAwareGroupedCoursesCardProps extends GroupedCoursesCardProps {
+  theme?: 'dark' | 'light';
+}
+
+const GroupedCoursesCard: React.FC<ThemeAwareGroupedCoursesCardProps> = ({
   group,
   ambulance,
   onRemoveCourse,
+  theme: propTheme,
 }) => {
+  // Utiliser le thème du contexte si non fourni en prop
+  const themeContext = useTheme();
+  const theme = propTheme || themeContext.theme;
+
   const [isExpanded, setIsExpanded] = useState(false);
 
   const timeRangeDisplay = useMemo(() => {
@@ -21,19 +32,78 @@ const GroupedCoursesCard: React.FC<GroupedCoursesCardProps> = ({
     return group.courses.map((course) => course.patientName).join(", ");
   }, [group.courses]);
 
+  // Classes CSS adaptatives selon le thème
+  const collapsedCardClasses = `
+    p-1.5 rounded shadow-sm ${colorClass()}
+    cursor-pointer flex items-center gap-1 z-10 mr-1 text-xs hover:shadow 
+    transition-all duration-200 border 
+    ${theme === 'dark' 
+      ? 'bg-gray-700 border-blue-700 text-gray-200' 
+      : 'bg-white border-blue-200 text-gray-800'}
+  `;
+
+  const expandedCardClasses = `
+    p-2 rounded shadow-md z-20 mr-1 text-xs absolute left-0 right-1 border
+    ${theme === 'dark' 
+      ? 'bg-gray-700 border-blue-700' 
+      : 'bg-white border-blue-200'}
+  `;
+
+  const headerRowClasses = `
+    flex justify-between items-center mb-1.5 pb-1 border-b 
+    ${theme === 'dark' ? 'border-gray-600' : 'border-gray-100'}
+  `;
+
+  const courseItemClasses = `
+    flex border-b pb-1.5 last:border-0 last:pb-0 
+    ${theme === 'dark' ? 'border-gray-600' : 'border-gray-100'}
+  `;
+
+  const timeClasses = `
+    text-blue-600 font-medium flex items-center text-xs
+    ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}
+  `;
+
+  const closeButtonClasses = `
+    ${theme === 'dark' ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'}
+  `;
+
+  const removeButtonClasses = `
+    ml-1
+    ${theme === 'dark' ? 'text-gray-500 hover:text-red-400' : 'text-gray-400 hover:text-red-500'}
+  `;
+
+  const badgeClasses = `
+    flex-shrink-0 text-white rounded-full h-5 w-5 flex items-center justify-center mr-1
+    ${theme === 'dark' ? 'bg-blue-600' : 'bg-blue-500'}
+  `;
+
+  const nameClasses = `
+    font-medium
+    ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}
+  `;
+
+  const addressClasses = `
+    truncate text-xs
+    ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}
+  `;
+
+  const scheduledTimeClasses = `
+    text-xs
+    ${theme === 'dark' ? 'text-green-400' : 'text-green-600'}
+  `;
+
   if (!isExpanded) {
     return (
       <div
-        className={`p-1.5 rounded shadow-sm bg-white ${colorClass()}
-          cursor-pointer flex items-center gap-1 z-10 mr-1 text-xs hover:shadow 
-          transition-all duration-200 border-blue-200 border`}
+        className={collapsedCardClasses}
         onClick={() => setIsExpanded(true)}
       >
-        <div className="flex-shrink-0 bg-blue-500 text-white rounded-full h-5 w-5 flex items-center justify-center mr-1">
+        <div className={badgeClasses}>
           <span className="text-xs font-medium">{group.courses.length}</span>
         </div>
         <div className="flex-shrink-0">
-          <div className="text-blue-600 font-medium flex items-center text-xs">
+          <div className={timeClasses}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-3 w-3 mr-0.5"
@@ -50,7 +120,7 @@ const GroupedCoursesCard: React.FC<GroupedCoursesCardProps> = ({
           </div>
         </div>
         <div className="flex-grow truncate">
-          <div className="font-medium text-gray-800 truncate">
+          <div className={nameClasses}>
             {patientsList}
           </div>
         </div>
@@ -59,20 +129,17 @@ const GroupedCoursesCard: React.FC<GroupedCoursesCardProps> = ({
   }
 
   return (
-    <div
-      className={`p-2 rounded shadow-md bg-white ${colorClass()}
-        z-20 mr-1 text-xs absolute left-0 right-1 border-blue-200 border`}
-    >
-      <div className="flex justify-between items-center mb-1.5 pb-1 border-b border-gray-100">
+    <div className={expandedCardClasses}>
+      <div className={headerRowClasses}>
         <div className="flex items-center">
-          <div className="flex-shrink-0 bg-blue-500 text-white rounded-full h-5 w-5 flex items-center justify-center mr-1.5">
+          <div className={badgeClasses}>
             <span className="text-xs font-medium">{group.courses.length}</span>
           </div>
-          <span className="text-blue-600 font-medium">{timeRangeDisplay}</span>
+          <span className={timeClasses}>{timeRangeDisplay}</span>
         </div>
         <button
           onClick={() => setIsExpanded(false)}
-          className="text-gray-400 hover:text-gray-600"
+          className={closeButtonClasses}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -94,18 +161,18 @@ const GroupedCoursesCard: React.FC<GroupedCoursesCardProps> = ({
         {group.courses.map((course) => (
           <div
             key={course.id}
-            className="flex border-b border-gray-100 pb-1.5 last:border-0 last:pb-0"
+            className={courseItemClasses}
           >
             <div className="flex-shrink-0 mr-1">
-              <div className="text-green-600 text-xs">
+              <div className={scheduledTimeClasses}>
                 {formatTime(course.scheduledTime)}
               </div>
             </div>
             <div className="flex-grow">
-              <div className="font-medium text-gray-800">
+              <div className={nameClasses}>
                 {course.patientName}
               </div>
-              <div className="text-gray-500 truncate text-xs">
+              <div className={addressClasses}>
                 {course.destinationAddress}
               </div>
             </div>
@@ -114,7 +181,7 @@ const GroupedCoursesCard: React.FC<GroupedCoursesCardProps> = ({
                 e.stopPropagation();
                 onRemoveCourse(course.id);
               }}
-              className="text-gray-400 hover:text-red-500 ml-1"
+              className={removeButtonClasses}
               title="Retirer du planning"
             >
               <svg

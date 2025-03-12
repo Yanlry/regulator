@@ -5,15 +5,14 @@ import { HourBlockProps, DragItem, Course, CourseGroup } from '../Regulation/typ
 import { groupCloseScheduledCourses } from '../Regulation/utils';
 import ScheduledCourseCard from './ScheduledCourseCard';
 import GroupedCoursesCard from './GroupedCoursesCard';
+import { useTheme } from '../../contexts/ThemeContext';
 
-// Update the HourBlockProps interface in your types.ts file to include these new props
-// export interface HourBlockProps {
-//   // existing props...
-//   onDragStart?: () => void;
-//   onDragEnd?: () => void;
-// }
+// Interface étendue pour inclure le thème
+interface ThemeAwareHourBlockProps extends HourBlockProps {
+  theme?: 'dark' | 'light';
+}
 
-const HourBlock: React.FC<HourBlockProps> = ({
+const HourBlock: React.FC<ThemeAwareHourBlockProps> = ({
   hour,
   date,
   ambulanceId,
@@ -26,11 +25,31 @@ const HourBlock: React.FC<HourBlockProps> = ({
   onHoverEnd,
   onDragStart,
   onDragEnd,
+  theme: propTheme,
 }) => {
+  // Récupérer le thème du contexte si non fourni via props
+  const themeContext = useTheme();
+  const theme = propTheme || themeContext.theme;
+
   const [previewTime, setPreviewTime] = useState<Date | null>(null);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   
   const blockRef = useRef<HTMLDivElement | null>(null);
+
+  const minuteMarkerCommonClasses = `
+    absolute left-0 right-0 border-t border-dashed pointer-events-none
+    ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}
+  `;
+
+  const previewLineClasses = `
+    absolute left-0 right-0 border-t-2 z-10 pointer-events-none
+    ${theme === 'dark' ? 'border-blue-400' : 'border-blue-500'}
+  `;
+
+  const timeIndicatorClasses = `
+    absolute left-0 text-white text-xs px-1 py-0.5 rounded z-20 pointer-events-none transform -translate-x-1/2
+    ${theme === 'dark' ? 'bg-blue-700' : 'bg-blue-600'}
+  `;
 
   // Create the hour start time
   const hourStartTime = useMemo(() => {
@@ -146,14 +165,30 @@ const HourBlock: React.FC<HourBlockProps> = ({
     },
     [drop]
   );
+  
+  // Classes CSS adaptatives selon le thème - défini après l'obtention de isOver
+  const blockClasses = `
+    border-t relative transition-colors duration-200
+    ${theme === 'dark' 
+      ? isAlternateRow 
+        ? 'bg-gray-700 border-gray-600' 
+        : 'bg-gray-800 border-gray-600' 
+      : isAlternateRow 
+        ? 'bg-gray-50 border-gray-200' 
+        : 'bg-white border-gray-200'
+    }
+    ${isOver 
+      ? theme === 'dark'
+        ? 'bg-blue-900'
+        : 'bg-blue-50'
+      : ''
+    }
+  `;
 
   return (
     <div
       ref={handleRefUpdate}
-      className={`border-t border-gray-200 relative ${
-        isAlternateRow ? "bg-gray-50" : "bg-white"
-      } 
-        ${isOver ? "bg-blue-50" : ""} transition-colors duration-200`}
+      className={blockClasses}
       style={{ height: "100px" }}
       onMouseLeave={() => {
         if (onHoverEnd) onHoverEnd();
@@ -161,16 +196,16 @@ const HourBlock: React.FC<HourBlockProps> = ({
       }}
     >
       {/* Minute markers for better precision - 15, 30, 45 minute intervals */}
-      <div className="absolute top-[25px] left-0 right-0 border-t border-dashed border-gray-200 pointer-events-none opacity-30"></div>
-      <div className="absolute top-[50px] left-0 right-0 border-t border-dashed border-gray-200 pointer-events-none opacity-50"></div>
-      <div className="absolute top-[75px] left-0 right-0 border-t border-dashed border-gray-200 pointer-events-none opacity-30"></div>
+      <div className={`${minuteMarkerCommonClasses} top-[25px] opacity-30`}></div>
+      <div className={`${minuteMarkerCommonClasses} top-[50px] opacity-50`}></div>
+      <div className={`${minuteMarkerCommonClasses} top-[75px] opacity-30`}></div>
 
       {/* Indicator for exact time during drag operation */}
       {isOver && previewTime && (
         <>
           {/* Line indicating exact minute position */}
           <div
-            className="absolute left-0 right-0 border-t-2 border-blue-500 z-10 pointer-events-none"
+            className={previewLineClasses}
             style={{
               top: `${(previewTime.getMinutes() / 60) * 100}px`,
             }}
@@ -178,7 +213,7 @@ const HourBlock: React.FC<HourBlockProps> = ({
           
           {/* Optional: Small time indicator bubble */}
           <div 
-            className="absolute left-0 bg-blue-600 text-white text-xs px-1 py-0.5 rounded z-20 pointer-events-none transform -translate-x-1/2"
+            className={timeIndicatorClasses}
             style={{
               top: `${(previewTime.getMinutes() / 60) * 100}px`,
               left: "0px"  // If you want it inside the block
@@ -210,6 +245,7 @@ const HourBlock: React.FC<HourBlockProps> = ({
                   group={group}
                   ambulance={ambulance}
                   onRemoveCourse={onRemoveCourse}
+                  theme={theme}
                 />
               </div>
             );
@@ -232,6 +268,7 @@ const HourBlock: React.FC<HourBlockProps> = ({
                   onRemove={() => onRemoveCourse(course.id)}
                   isCompact={false}
                   hasCollision={false}
+                  theme={theme}
                 />
               </div>
             );

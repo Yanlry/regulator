@@ -4,14 +4,25 @@ import { getEmptyImage } from 'react-dnd-html5-backend';
 import { DragSourceMonitor } from 'react-dnd';
 import { ScheduledCourseCardProps, DragItem } from '../Regulation/types';
 import { formatTime, getAmbulanceColorClass } from '../Regulation/utils';
+import { useTheme } from '../../contexts/ThemeContext';
 
-const ScheduledCourseCard: React.FC<ScheduledCourseCardProps> = ({
+// Interface étendue pour inclure le thème
+interface ThemeAwareScheduledCourseCardProps extends Omit<ScheduledCourseCardProps, 'theme'> {
+  theme?: 'dark' | 'light';
+}
+
+const ScheduledCourseCard: React.FC<ThemeAwareScheduledCourseCardProps> = ({
   course,
   onRemove,
   ambulance,
   isCompact = false,
   hasCollision = false,
+  theme: propTheme,
 }) => {
+  // Récupérer le thème du contexte si non fourni via props
+  const themeContext = useTheme();
+  const theme = propTheme || themeContext.theme;
+
   const [expanded, setExpanded] = useState(false);
 
   const [{ isDragging }, drag, preview] = useDrag(() => ({
@@ -30,21 +41,67 @@ const ScheduledCourseCard: React.FC<ScheduledCourseCardProps> = ({
     preview(getEmptyImage(), { captureDraggingState: true });
   }, [preview]);
 
+  // Classes CSS adaptatives selon le thème pour le mode compact
+  const compactCardClasses = `
+    p-1 rounded shadow-sm ${getAmbulanceColorClass(ambulance.color)} 
+    ${isDragging ? "opacity-50" : "opacity-100"} cursor-grab flex items-center 
+    justify-between gap-1 z-10 mr-1 text-xs hover:shadow transition-all duration-200
+    ${hasCollision ? "mb-1 opacity-80" : ""}
+    ${theme === 'dark' ? 'bg-gray-700 text-gray-200' : 'bg-white text-gray-800'}
+  `;
+
+  // Classes CSS adaptatives selon le thème pour le mode standard
+  const standardCardClasses = `
+  p-1.5 rounded shadow-sm 
+  border-2 ${getAmbulanceColorClass(ambulance.color).replace('border-l', 'border')}
+  ${isDragging ? "opacity-50" : "opacity-100"} cursor-grab flex items-center 
+  gap-1 z-10 mr-1 text-xs hover:shadow transition-shadow duration-200
+  ${isCompact && expanded ? "shadow-md z-20 absolute left-0 right-1" : ""}
+  ${hasCollision ? "opacity-90" : ""}
+  ${theme === 'dark' ? 'bg-gray-700 text-gray-200' : 'bg-white text-gray-800'}
+`;
+
+  // Classes pour les textes et icônes
+  const scheduledTimeClasses = `
+    flex items-center text-xs
+    ${theme === 'dark' ? 'text-green-400' : 'text-green-600'}
+  `;
+
+  const appointmentTimeClasses = `
+    flex items-center text-xs
+    ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}
+  `;
+
+  const patientNameClasses = `
+    font-medium truncate
+    ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}
+  `;
+
+  const destinationAddressClasses = `
+    truncate flex items-center
+    ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}
+  `;
+
+  const removeButtonClasses = `
+    flex-shrink-0 transition-colors w-4 h-4 
+    flex items-center justify-center rounded-full
+    ${theme === 'dark' 
+      ? 'text-gray-500 hover:text-red-400 hover:bg-gray-600' 
+      : 'text-gray-400 hover:text-red-500 hover:bg-red-50'}
+  `;
+
   if (isCompact && !expanded) {
     return (
       <div
         ref={drag}
-        className={`p-1 rounded shadow-sm bg-white ${getAmbulanceColorClass(ambulance.color)} 
-          ${isDragging ? "opacity-50" : "opacity-100"} cursor-grab flex items-center 
-          justify-between gap-1 z-10 mr-1 text-xs hover:shadow transition-all duration-200
-          ${hasCollision ? "mb-1 opacity-80" : ""}`}
+        className={compactCardClasses}
         onMouseEnter={() => setExpanded(true)}
         onMouseLeave={() => setExpanded(false)}
       >
         <div className="flex-shrink-0 font-medium truncate">
           {course.patientName.split(" ")[0]}
         </div>
-        <div className="flex-shrink-0 text-blue-600 flex items-center text-xs whitespace-nowrap">
+        <div className={appointmentTimeClasses + " whitespace-nowrap"}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-2.5 w-2.5 mr-0.5 flex-shrink-0"
@@ -65,8 +122,7 @@ const ScheduledCourseCard: React.FC<ScheduledCourseCardProps> = ({
               e.stopPropagation();
               onRemove();
             }}
-            className="flex-shrink-0 text-gray-400 hover:text-red-500 transition-colors w-4 h-4 
-              flex items-center justify-center rounded-full hover:bg-red-50"
+            className={removeButtonClasses}
             title="Retirer du planning"
           >
             <svg
@@ -90,15 +146,11 @@ const ScheduledCourseCard: React.FC<ScheduledCourseCardProps> = ({
   return (
     <div
       ref={drag}
-      className={`p-1.5 rounded shadow-sm bg-white ${getAmbulanceColorClass(ambulance.color)}
-        ${isDragging ? "opacity-50" : "opacity-100"} cursor-grab flex items-center 
-        gap-1 z-10 mr-1 text-xs hover:shadow transition-shadow duration-200
-        ${isCompact && expanded ? "shadow-md z-20 absolute left-0 right-1 bg-white" : ""}
-        ${hasCollision ? "opacity-90" : ""}`}
+      className={standardCardClasses}
       onMouseLeave={() => isCompact && setExpanded(false)}
     >
       <div className="flex-shrink-0">
-        <div className="text-green-600 flex items-center text-xs">
+        <div className={scheduledTimeClasses}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-2.5 w-2.5 mr-0.5"
@@ -110,7 +162,7 @@ const ScheduledCourseCard: React.FC<ScheduledCourseCardProps> = ({
           </svg>
           {formatTime(course.scheduledTime)}
         </div>
-        <div className="text-blue-600 flex items-center text-xs">
+        <div className={appointmentTimeClasses}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-2.5 w-2.5 mr-0.5"
@@ -127,10 +179,10 @@ const ScheduledCourseCard: React.FC<ScheduledCourseCardProps> = ({
         </div>
       </div>
       <div className="flex-grow truncate">
-        <div className="font-medium text-gray-800 truncate">
+        <div className={patientNameClasses}>
           {course.patientName}
         </div>
-        <div className="text-gray-500 truncate flex items-center">
+        <div className={destinationAddressClasses}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-2.5 w-2.5 mr-0.5 flex-shrink-0"
@@ -148,8 +200,7 @@ const ScheduledCourseCard: React.FC<ScheduledCourseCardProps> = ({
             e.stopPropagation();
             onRemove();
           }}
-          className="flex-shrink-0 text-gray-400 hover:text-red-500 transition-colors w-4 h-4 
-            flex items-center justify-center rounded-full hover:bg-red-50"
+          className={removeButtonClasses}
           title="Retirer du planning"
         >
           <svg

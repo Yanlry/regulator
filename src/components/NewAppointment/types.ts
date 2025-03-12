@@ -33,6 +33,7 @@ export interface Appointment {
   transportFormStatus: 'ready' | 'collect' | 'pending' | 'samu';
   requiredEquipment: string[];
   additionalNotes: string;
+  theme: string;
 }
 
 export interface NewAppointmentProps {

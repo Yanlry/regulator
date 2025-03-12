@@ -4,8 +4,21 @@ import { getEmptyImage } from 'react-dnd-html5-backend';
 import { DragSourceMonitor } from 'react-dnd';
 import { UnassignedCourseCardProps, DragItem } from '../Regulation/types';
 import { formatTime } from '../Regulation/utils';
+import { useTheme } from '../../contexts/ThemeContext';
 
-const UnassignedCourseCard: React.FC<UnassignedCourseCardProps> = ({ course }) => {
+// Interface étendue pour inclure le thème
+interface ThemeAwareUnassignedCourseCardProps extends Omit<UnassignedCourseCardProps, 'theme'> {
+  theme?: 'dark' | 'light';
+}
+
+const UnassignedCourseCard: React.FC<ThemeAwareUnassignedCourseCardProps> = ({ 
+  course,
+  theme: propTheme 
+}) => {
+  // Récupérer le thème du contexte si non fourni via props
+  const themeContext = useTheme();
+  const theme = propTheme || themeContext.theme;
+
   const [{ isDragging }, drag, preview] = useDrag(() => ({
     type: "COURSE",
     item: {
@@ -22,14 +35,37 @@ const UnassignedCourseCard: React.FC<UnassignedCourseCardProps> = ({ course }) =
     preview(getEmptyImage(), { captureDraggingState: true });
   }, [preview]);
 
+  // Classes CSS adaptatives selon le thème
+  const cardClasses = `
+    p-2 rounded shadow-sm border
+    ${isDragging ? "opacity-50" : "opacity-100"} cursor-grab hover:shadow 
+    transition-shadow duration-200 w-[180px]
+    ${theme === 'dark' 
+      ? 'bg-gray-700 border-gray-600' 
+      : 'bg-white border-gray-200'}
+  `;
+
+  const timeClasses = `
+    flex items-center text-xs font-medium mb-1
+    ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}
+  `;
+
+  const nameClasses = `
+    font-medium text-sm truncate mb-1
+    ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}
+  `;
+
+  const addressClasses = `
+    text-xs truncate flex items-start
+    ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}
+  `;
+
   return (
     <div
       ref={drag}
-      className={`p-2 rounded shadow-sm bg-white border border-gray-200
-        ${isDragging ? "opacity-50" : "opacity-100"} cursor-grab hover:shadow 
-        transition-shadow duration-200 w-[180px]`}
+      className={cardClasses}
     >
-      <div className="flex items-center text-xs text-blue-600 font-medium mb-1">
+      <div className={timeClasses}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-3 w-3 mr-1"
@@ -44,10 +80,10 @@ const UnassignedCourseCard: React.FC<UnassignedCourseCardProps> = ({ course }) =
         </svg>
         {formatTime(course.appointmentTime)}
       </div>
-      <div className="font-medium text-gray-800 text-sm truncate mb-1">
+      <div className={nameClasses}>
         {course.patientName}
       </div>
-      <div className="text-xs text-gray-500 truncate mb-0.5 flex items-start">
+      <div className={`${addressClasses} mb-0.5`}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-3 w-3 mr-1 mt-0.5 flex-shrink-0"
@@ -62,7 +98,7 @@ const UnassignedCourseCard: React.FC<UnassignedCourseCardProps> = ({ course }) =
         </svg>
         <span className="truncate">{course.pickupAddress}</span>
       </div>
-      <div className="text-xs text-gray-500 truncate flex items-start">
+      <div className={addressClasses}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-3 w-3 mr-1 mt-0.5 flex-shrink-0"

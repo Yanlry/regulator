@@ -134,14 +134,14 @@ const Appointments: React.FC<AppointmentsProps> = () => {
     transition-all duration-300 
     min-h-screen p-4
     ${theme === 'dark' 
-      ? 'bg-gray-900 text-gray-100' 
+      ? 'bg-gray-800 text-gray-100' 
       : 'bg-gray-100 text-gray-900'}
   `;
 
   const spinnerContainerClasses = `
     flex items-center justify-center 
     ${theme === 'dark' 
-      ? 'bg-gray-900' 
+      ? 'bg-gray-800' 
       : 'bg-gray-100'}
     min-h-screen
   `;

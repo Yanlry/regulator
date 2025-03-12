@@ -109,6 +109,7 @@ const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
     transportFormStatus: 'ready',
     requiredEquipment: [],
     additionalNotes: '',
+    theme: theme,
   });
  
   const [componentsOrder, setComponentsOrder] = useState<ComponentOrder[]>([
@@ -212,7 +213,7 @@ const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
   const containerClasses = `
     transition-all duration-300 min-h-screen absolute right-0
     ${theme === 'dark' 
-      ? 'bg-gray-900 text-gray-100' 
+      ? 'bg-gray-800 text-gray-100' 
       : 'bg-gray-100 text-gray-900'}
   `;
 
@@ -312,7 +313,6 @@ const NewAppointment: React.FC<NewAppointmentProps> = ({ isOpen }) => {
             <AppointmentSummary 
               appointment={appointment} 
               onSubmit={handleSubmit}
-              theme={theme}
             />
           </div>
         )}

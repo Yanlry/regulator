@@ -36,6 +36,19 @@ export const useScheduleData = () => {
     );
   }, []);
 
+  // Fonction pour vider toutes les courses d'une ambulance
+  const handleClearAmbulance = useCallback((ambulanceId: string) => {
+    console.log("Vidage de l'ambulance:", ambulanceId); // Débogage
+    
+    setCourses((prevCourses) =>
+      prevCourses.map((course) =>
+        course.assignedTo === ambulanceId
+          ? { ...course, assignedTo: null, scheduledTime: null }
+          : course
+      )
+    );
+  }, []);
+
   const handleDropCourse = useCallback(
     (
       courseId: string,
@@ -107,5 +120,6 @@ export const useScheduleData = () => {
     handleUnassignCourse,
     handleDropCourse,
     getCoursesForHour,
+    handleClearAmbulance, // Exposer la nouvelle fonction
   };
 };

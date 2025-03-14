@@ -21,12 +21,13 @@ const Regulation: React.FC<RegulationProps> = ({ isOpen }) => {
   const {
     ambulances,
     isLoading,
-    hours,
+    hours, // Récupérer hours de useScheduleData
     unassignedCourses,
     tomorrow,
     handleUnassignCourse,
     handleDropCourse,
     getCoursesForHour,
+    handleClearAmbulance,
   } = useScheduleData();
 
   const {
@@ -46,6 +47,9 @@ const Regulation: React.FC<RegulationProps> = ({ isOpen }) => {
     max-w-7xl mx-auto px-3 py-5
     ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}
   `;
+
+  // Vérifier que handleClearAmbulance est disponible
+  console.log("handleClearAmbulance disponible:", !!handleClearAmbulance);
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -69,12 +73,10 @@ const Regulation: React.FC<RegulationProps> = ({ isOpen }) => {
               ambulances={ambulances}
               onDropCourse={handleUnassignCourse}
               onAutoAssign={() => { /* Add your onAutoAssign logic here */ }}
-              // Passer le thème au composant UnassignedArea
-              // (Déjà géré par useTheme à l'intérieur du composant modifié)
             />
 
             <ScheduleGrid
-              hours={hours}
+              hours={hours} // Ajouter hours comme prop
               tomorrow={tomorrow}
               hoveredTimeInfo={hoveredTimeInfo}
               setHoveredTimeInfo={setHoveredTimeInfo}
@@ -82,6 +84,7 @@ const Regulation: React.FC<RegulationProps> = ({ isOpen }) => {
               handleUnassignCourse={handleUnassignCourse}
               getCoursesForHour={getCoursesForHour}
               theme={theme}
+              handleClearAmbulance={handleClearAmbulance}
             />
           </div>
         )}

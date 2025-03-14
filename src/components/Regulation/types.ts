@@ -67,6 +67,7 @@ export interface HourBlockProps {
   onHoverEnd?: () => void;
   onDragStart?: () => void;
   onDragEnd?: () => void;
+  theme?: 'dark' | 'light';
 }
 
 export interface GroupedCoursesCardProps {
@@ -116,10 +117,10 @@ export interface ScheduleGridProps {
   ) => void;
   handleUnassignCourse: (courseId: string) => void;
   getCoursesForHour: (ambulanceId: string, hour: number) => Course[];
+  handleClearAmbulance?: (ambulanceId: string) => void; // Ajout de cette propriété
 }
 
 export interface ScheduleHeaderProps {
   tomorrow: Date;
   theme: string;
-
 }
